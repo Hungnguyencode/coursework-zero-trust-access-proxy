@@ -1,0 +1,4666 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zero Trust Security Center</title>
+  <style>
+    :root{
+      --bg:#07101f;
+      --bg2:#0b1426;
+      --panel:#111b30;
+      --panel2:#0d1729;
+      --border:#263653;
+      --border-strong:#355077;
+      --text:#eef5ff;
+      --muted:#8ea2bf;
+      --cyan:#42d5ff;
+      --blue:#6798ff;
+      --green:#4de39b;
+      --yellow:#f8c65c;
+      --red:#ff6b7e;
+      --shadow:0 18px 60px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 15% 0%,rgba(66,213,255,.08),transparent 30%),
+        radial-gradient(circle at 90% 10%,rgba(179,140,255,.07),transparent 28%),
+        linear-gradient(180deg,#07101f 0%,#080f1d 100%);
+      color:var(--text);
+    }
+    button,input{font:inherit}
+    .app{
+      max-width:1480px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:22px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border:1px solid rgba(66,213,255,.35);
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(145deg,rgba(66,213,255,.16),rgba(103,152,255,.08));
+      box-shadow:0 0 30px rgba(66,213,255,.08);
+    }
+    .brand h1{
+      margin:0;
+      font-size:clamp(21px,2.2vw,30px);
+      letter-spacing:-.03em;
+    }
+    .brand p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .system-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      padding:9px 13px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      color:var(--muted);
+      background:rgba(13,23,41,.75);
+      white-space:nowrap;
+      font-size:13px;
+      transition:.25s ease;
+    }
+    .system-pill.bad{
+      color:#ffb2bd;
+      border-color:rgba(255,107,126,.30);
+      background:rgba(255,107,126,.06);
+    }
+    .system-pill.warn{
+      color:#ffe09a;
+      border-color:rgba(248,198,92,.28);
+      background:rgba(248,198,92,.06);
+    }
+    .pulse{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#657793;
+    }
+    .pulse.online{
+      background:var(--green);
+      animation:pulse 2s infinite;
+    }
+    .pulse.warn{
+      background:var(--yellow);
+      animation:pulseWarn 1.8s infinite;
+    }
+    .pulse.bad{
+      background:var(--red);
+      animation:pulseBad 1.5s infinite;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(77,227,155,.35)}
+      70%{box-shadow:0 0 0 8px rgba(77,227,155,0)}
+      100%{box-shadow:0 0 0 0 rgba(77,227,155,0)}
+    }
+    @keyframes pulseWarn{
+      0%{box-shadow:0 0 0 0 rgba(248,198,92,.28)}
+      70%{box-shadow:0 0 0 8px rgba(248,198,92,0)}
+      100%{box-shadow:0 0 0 0 rgba(248,198,92,0)}
+    }
+    @keyframes pulseBad{
+      0%{box-shadow:0 0 0 0 rgba(255,107,126,.30)}
+      70%{box-shadow:0 0 0 8px rgba(255,107,126,0)}
+      100%{box-shadow:0 0 0 0 rgba(255,107,126,0)}
+    }
+    .hero{
+      display:grid;
+      grid-template-columns:minmax(290px,380px) 1fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+    .panel{
+      background:linear-gradient(180deg,rgba(18,30,53,.96),rgba(13,23,41,.96));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transition:border-color .25s ease,transform .25s ease,box-shadow .25s ease;
+    }
+    .panel:hover{
+      border-color:#304463;
+      box-shadow:0 22px 70px rgba(0,0,0,.32);
+    }
+    .panel-inner{padding:20px}
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .section-title h2,
+    .section-title h3{
+      margin:0;
+      font-size:17px;
+      letter-spacing:.02em;
+    }
+    .eyebrow{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#657793;
+      margin-bottom:5px;
+    }
+    .login-grid{display:grid;gap:10px}
+    .field label{
+      display:block;
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:6px;
+    }
+    input{
+      width:100%;
+      border:1px solid var(--border-strong);
+      border-radius:11px;
+      padding:11px 12px;
+      background:#091426;
+      color:var(--text);
+      outline:none;
+      transition:.2s ease;
+    }
+    input:focus{
+      border-color:var(--cyan);
+      box-shadow:0 0 0 3px rgba(66,213,255,.09);
+    }
+    .btn-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:9px;
+      margin-top:4px;
+    }
+    .btn{
+      border:1px solid var(--border-strong);
+      border-radius:11px;
+      padding:10px 13px;
+      background:#111d33;
+      color:var(--text);
+      cursor:pointer;
+      font-weight:700;
+      transition:transform .15s ease,border-color .15s ease,filter .15s ease;
+    }
+    .btn:hover{
+      transform:translateY(-1px);
+      border-color:#4c6993;
+      filter:brightness(1.06);
+    }
+    .btn:active{transform:translateY(0)}
+    .btn.primary{
+      background:linear-gradient(135deg,#2478ff,#4e8cff);
+      border-color:#4e8cff;
+    }
+    .btn.good{
+      border-color:rgba(77,227,155,.38);
+      color:#a9ffd0;
+    }
+    .btn.danger{
+      border-color:rgba(255,107,126,.38);
+      color:#ffb2bd;
+    }
+    .session-box{
+      margin-top:14px;
+      border-top:1px solid var(--border);
+      padding-top:14px;
+      display:grid;
+      gap:8px;
+    }
+    .session-line{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .session-line strong{color:var(--text)}
+    .summary{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      padding:16px;
+    }
+    .metric{
+      background:rgba(8,17,32,.66);
+      border:1px solid var(--border);
+      border-radius:15px;
+      padding:15px;
+      min-height:118px;
+      transition:.25s ease;
+    }
+    .metric.changed{
+      border-color:rgba(248,198,92,.45);
+      box-shadow:0 0 0 3px rgba(248,198,92,.05);
+    }
+    .metric .label{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      margin-bottom:11px;
+    }
+    .metric .value{
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:-.02em;
+      transition:color .2s ease,transform .2s ease;
+    }
+    .metric .sub{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:7px;
+      line-height:1.35;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:5px 9px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .badge:before{
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:currentColor;
+      box-shadow:0 0 12px currentColor;
+    }
+    .badge.good{
+      color:var(--green);
+      background:rgba(77,227,155,.07);
+      border-color:rgba(77,227,155,.23);
+    }
+    .badge.bad{
+      color:var(--red);
+      background:rgba(255,107,126,.07);
+      border-color:rgba(255,107,126,.23);
+    }
+    .badge.warn{
+      color:var(--yellow);
+      background:rgba(248,198,92,.07);
+      border-color:rgba(248,198,92,.23);
+    }
+    .badge.neutral{color:#9bb0cd}
+    .content-grid{
+      display:grid;
+      grid-template-columns:1.05fr 1.05fr 1.2fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+    .trust-hero{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+      padding:14px;
+      background:rgba(7,16,31,.52);
+      border:1px solid var(--border);
+      border-radius:14px;
+    }
+    .trust-hero .big{
+      font-size:24px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .facts{display:grid;gap:9px}
+    .fact{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(38,54,83,.65);
+      font-size:13px;
+    }
+    .fact:last-child{border-bottom:0}
+    .fact span:first-child{color:var(--muted)}
+    .fact strong{text-align:right}
+    .check-list{display:grid;gap:8px}
+    .check{
+      display:grid;
+      grid-template-columns:28px 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:10px 11px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:rgba(8,17,32,.54);
+      transition:.2s ease;
+    }
+    .check-icon{
+      width:28px;
+      height:28px;
+      border-radius:9px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-weight:900;
+    }
+    .check.pass .check-icon{
+      color:var(--green);
+      border-color:rgba(77,227,155,.28);
+      background:rgba(77,227,155,.05);
+    }
+    .check.fail .check-icon{
+      color:var(--red);
+      border-color:rgba(255,107,126,.28);
+      background:rgba(255,107,126,.05);
+    }
+    .check.unknown .check-icon{
+      color:var(--yellow);
+      border-color:rgba(248,198,92,.28);
+      background:rgba(248,198,92,.05);
+    }
+    .check-name{font-size:13px;font-weight:700}
+    .check-detail{font-size:11px;color:var(--muted);margin-top:2px}
+    .check-state{color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:800}
+    .decision-card{min-height:100%}
+    .decision-main{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:16px;
+      border:1px solid var(--border);
+      border-radius:15px;
+      background:rgba(8,17,32,.58);
+      margin-bottom:12px;
+      transition:.25s ease;
+    }
+    .decision-word{
+      font-size:28px;
+      font-weight:950;
+      letter-spacing:-.04em;
+    }
+    .decision-word.allow{color:var(--green)}
+    .decision-word.deny{color:var(--red)}
+    .decision-word.idle{color:var(--muted)}
+    .decision-word.stale{color:var(--yellow)}
+    .decision-freshness{
+      display:none;
+      gap:12px;
+      align-items:flex-start;
+      margin:0 0 12px;
+      padding:13px 14px;
+      border:1px solid rgba(248,198,92,.32);
+      border-radius:13px;
+      background:
+        linear-gradient(90deg,rgba(248,198,92,.10),rgba(248,198,92,.035));
+      color:#ffe09a;
+      animation:bannerIn .25s ease;
+    }
+    .decision-freshness.show{display:flex}
+    .decision-freshness .icon{
+      width:27px;
+      height:27px;
+      flex:0 0 27px;
+      display:grid;
+      place-items:center;
+      border-radius:9px;
+      border:1px solid rgba(248,198,92,.35);
+      background:rgba(248,198,92,.08);
+      font-weight:900;
+    }
+    .decision-freshness strong{
+      display:block;
+      font-size:13px;
+      margin-bottom:3px;
+    }
+    .decision-freshness span{
+      color:#c9b983;
+      font-size:11px;
+      line-height:1.45;
+    }
+    @keyframes bannerIn{
+      from{opacity:0;transform:translateY(-5px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    .reason-box{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      background:#091426;
+      margin-bottom:12px;
+    }
+    .reason-label{
+      font-size:10px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.11em;
+      margin-bottom:6px;
+    }
+    .reason{
+      font-weight:850;
+      word-break:break-word;
+    }
+    .protected-preview{
+      margin-top:auto;
+      border-top:1px solid var(--border);
+      padding-top:12px;
+    }
+    .records{
+      display:grid;
+      gap:7px;
+      margin-top:9px;
+    }
+    .record{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      padding:9px 10px;
+      border-radius:10px;
+      background:rgba(7,16,31,.56);
+      border:1px solid rgba(38,54,83,.8);
+      font-size:12px;
+    }
+    .lower-grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+    }
+    .timeline{
+      display:flex;
+      gap:8px;
+      align-items:flex-end;
+      min-height:116px;
+      padding:14px 8px 8px;
+      overflow-x:auto;
+    }
+    .timeline-item{
+      min-width:54px;
+      text-align:center;
+    }
+    .timeline-bar{
+      height:62px;
+      border:1px solid var(--border);
+      border-radius:9px 9px 4px 4px;
+      background:rgba(8,17,32,.72);
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+    }
+    .timeline-fill{
+      width:100%;
+      min-height:12px;
+      transition:height .3s ease;
+    }
+    .timeline-fill.good{
+      background:linear-gradient(180deg,rgba(77,227,155,.9),rgba(77,227,155,.26));
+    }
+    .timeline-fill.bad{
+      background:linear-gradient(180deg,rgba(255,107,126,.9),rgba(255,107,126,.26));
+    }
+    .timeline-time{
+      margin-top:6px;
+      font-size:9px;
+      color:#657793;
+    }
+    .table-wrap{overflow-x:auto}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    th{
+      text-align:left;
+      color:#657793;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-weight:800;
+      padding:10px 8px;
+      border-bottom:1px solid var(--border);
+    }
+    td{
+      padding:10px 8px;
+      border-bottom:1px solid rgba(38,54,83,.55);
+      vertical-align:middle;
+    }
+    .mono{
+      font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    .empty{
+      color:#657793;
+      font-size:12px;
+      padding:14px 0;
+    }
+    .toast{
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      width:min(380px,calc(100vw - 44px));
+      padding:13px 14px;
+      background:#101c31;
+      border:1px solid var(--border-strong);
+      border-radius:13px;
+      box-shadow:var(--shadow);
+      color:var(--text);
+      font-size:13px;
+      opacity:0;
+      transform:translateY(12px);
+      pointer-events:none;
+      transition:.2s;
+      z-index:20;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+    .raw-details{
+      margin-top:12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .raw-details summary{
+      cursor:pointer;
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:12px;
+      background:rgba(7,16,31,.5);
+    }
+    .raw-details pre{
+      margin:0;
+      max-height:260px;
+      overflow:auto;
+      padding:12px;
+      background:#07101f;
+      color:#b8c8de;
+      font-size:11px;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    
+/* ============================================================
+   SECURITY EVENT TIMELINE — v1.3
+   Persisted security events + access decisions +
+   posture evidence + live decision freshness.
+   ============================================================ */
+.event-panel{margin-bottom:18px}
+.event-panel .panel-inner{padding:20px}
+.event-toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.event-feed{
+  position:relative;
+  display:grid;
+  gap:0;
+  margin-top:4px;
+  max-height:560px;
+  overflow:auto;
+  padding:2px 6px 2px 0;
+}
+.event-feed:before{
+  content:"";
+  position:absolute;
+  left:16px;
+  top:18px;
+  bottom:18px;
+  width:1px;
+  background:linear-gradient(180deg,rgba(66,213,255,.34),rgba(38,54,83,.62));
+}
+.event-row{
+  position:relative;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  gap:12px;
+  align-items:start;
+  padding:11px 10px 11px 0;
+  border-bottom:1px solid rgba(38,54,83,.48);
+}
+.event-row.event-new{
+  animation:eventIn .28s ease both;
+}
+.event-row:last-child{border-bottom:0}
+.event-dot{
+  position:relative;
+  z-index:1;
+  width:15px;
+  height:15px;
+  margin:4px 0 0 9px;
+  border-radius:50%;
+  border:3px solid #0d1729;
+  background:#657793;
+  box-shadow:0 0 0 1px rgba(101,119,147,.45),0 0 18px rgba(101,119,147,.12);
+}
+.event-row.good .event-dot{background:var(--green);box-shadow:0 0 0 1px rgba(77,227,155,.5),0 0 18px rgba(77,227,155,.22)}
+.event-row.bad .event-dot{background:var(--red);box-shadow:0 0 0 1px rgba(255,107,126,.5),0 0 18px rgba(255,107,126,.22)}
+.event-row.warn .event-dot{background:var(--yellow);box-shadow:0 0 0 1px rgba(248,198,92,.5),0 0 18px rgba(248,198,92,.20)}
+.event-row.info .event-dot{background:var(--cyan);box-shadow:0 0 0 1px rgba(66,213,255,.5),0 0 18px rgba(66,213,255,.18)}
+.event-title{font-size:13px;font-weight:850;letter-spacing:.01em}
+.event-detail{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.45}
+.event-meta{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;min-width:158px}
+.event-time{color:#7187a7;font-size:10px;font-family:"SFMono-Regular",Consolas,monospace;white-space:nowrap}
+.event-tag{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid var(--border);
+  border-radius:999px;color:#9bb0cd;background:rgba(7,16,31,.62);font-size:9px;font-weight:900;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap
+}
+.event-tag.good{color:var(--green);border-color:rgba(77,227,155,.24);background:rgba(77,227,155,.06)}
+.event-tag.bad{color:var(--red);border-color:rgba(255,107,126,.24);background:rgba(255,107,126,.06)}
+.event-tag.warn{color:var(--yellow);border-color:rgba(248,198,92,.24);background:rgba(248,198,92,.06)}
+.event-tag.info{color:var(--cyan);border-color:rgba(66,213,255,.24);background:rgba(66,213,255,.06)}
+.event-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0 14px}
+.event-stat{padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:rgba(8,17,32,.54)}
+.event-stat .k{font-size:10px;color:#657793;text-transform:uppercase;letter-spacing:.09em}
+.event-stat .v{margin-top:4px;font-size:17px;font-weight:900}
+.event-stat .v.good{color:var(--green)}
+.event-stat .v.bad{color:var(--red)}
+.event-stat .v.warn{color:var(--yellow)}
+.event-stat .v.info{color:var(--cyan)}
+@keyframes eventIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.demo-panel {
+  margin-bottom: 18px;
+}
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.demo-control {
+  min-height: 180px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(8, 17, 32, .58);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.demo-control-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+.demo-control-title {
+  font-size: 13px;
+  font-weight: 850;
+}
+.demo-control-sub {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.demo-control .btn-row {
+  margin-top: auto;
+}
+.demo-note {
+  margin-bottom: 14px;
+  padding: 11px 13px;
+  border: 1px solid rgba(248, 198, 92, .28);
+  border-radius: 12px;
+  background: rgba(248, 198, 92, .055);
+  color: #ffe09a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.demo-footer {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.demo-updated {
+  color: var(--muted);
+  font-size: 11px;
+}
+@media(max-width:1100px){
+  .demo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media(max-width:760px){
+  .demo-grid {
+    grid-template-columns: 1fr;
+  }
+  .demo-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+@media(max-width:760px){
+  .event-summary{grid-template-columns:repeat(2,1fr)}
+  .event-row{grid-template-columns:30px minmax(0,1fr)}
+  .event-meta{grid-column:2;justify-content:flex-start;min-width:0;margin-top:2px}
+  .event-feed:before{left:14px}
+  .event-dot{margin-left:7px}
+}
+@media(max-width:1100px){
+      .summary{grid-template-columns:repeat(2,1fr)}
+      .content-grid{grid-template-columns:1fr 1fr}
+      .decision-card{grid-column:1/-1}
+    }
+    @media(max-width:760px){
+      .app{padding:14px}
+      .topbar,.hero{display:grid;grid-template-columns:1fr}
+      .system-pill{justify-self:start}
+      .hero,.content-grid,.lower-grid{grid-template-columns:1fr}
+      .summary{grid-template-columns:1fr}
+    }
+    /* ============================================================
+       V1.4E — DECISION INSPECTOR
+       Evidence-driven trace visualization. No synthetic decision state.
+       ============================================================ */
+    .event-row.inspectable{
+      cursor:pointer;
+      border-radius:10px;
+      transition:background .16s,border-color .16s,transform .16s;
+    }
+    .event-row.inspectable:hover{
+      background:rgba(66,213,255,.055);
+      transform:translateX(2px);
+    }
+    .event-row.inspectable:focus-visible{
+      outline:2px solid rgba(66,213,255,.7);
+      outline-offset:-2px;
+    }
+    .event-row-chevron{
+      width:20px;
+      height:20px;
+      display:inline-grid;
+      place-items:center;
+      flex:0 0 auto;
+      border-radius:6px;
+      color:#7187a7;
+      font-size:17px;
+      font-weight:900;
+      line-height:1;
+      transition:color .16s, background .16s, transform .16s;
+    }
+    .event-row.inspectable:hover .event-row-chevron,
+    .event-row.inspectable:focus-visible .event-row-chevron{
+      color:var(--cyan);
+      background:rgba(66,213,255,.08);
+      transform:translateX(2px);
+    }
+    .audit-inspect-btn{
+      padding:5px 8px;
+      border:1px solid rgba(66,213,255,.28);
+      border-radius:8px;
+      background:rgba(66,213,255,.06);
+      color:var(--cyan);
+      font:800 9px/1 inherit;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+    .audit-inspect-btn:hover{background:rgba(66,213,255,.12)}
+    .inspector-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:rgba(2,7,16,.78);
+      backdrop-filter:blur(8px);
+    }
+    .inspector-backdrop.open{display:flex}
+    .inspector-modal{
+      width:min(1120px,96vw);
+      max-height:92vh;
+      overflow:auto;
+      border:1px solid #355077;
+      border-radius:18px;
+      background:
+        radial-gradient(circle at top right,rgba(66,213,255,.08),transparent 34%),
+        linear-gradient(180deg,#101b30,#0a1425);
+      box-shadow:0 28px 90px rgba(0,0,0,.55);
+    }
+    .inspector-head{
+      position:sticky;
+      top:0;
+      z-index:2;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      padding:18px 20px 16px;
+      border-bottom:1px solid var(--border);
+      background:rgba(13,23,41,.96);
+      backdrop-filter:blur(10px);
+    }
+    .inspector-title{
+      margin:4px 0 0;
+      font-size:22px;
+      letter-spacing:-.025em;
+    }
+    .inspector-request{
+      margin-top:7px;
+      color:#8ca4c5;
+      font:11px/1.45 "SFMono-Regular",Consolas,monospace;
+      word-break:break-all;
+    }
+    .inspector-close{
+      width:36px;
+      height:36px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:#0a1425;
+      color:var(--text);
+      cursor:pointer;
+      font-size:20px;
+    }
+    .inspector-body{padding:18px 20px 22px}
+    .inspector-loading,.inspector-error{
+      padding:34px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+    .inspector-error{color:var(--red)}
+    .inspector-summary{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .inspector-time{
+      margin-left:auto;
+      color:#7187a7;
+      font-size:10px;
+      font-family:"SFMono-Regular",Consolas,monospace;
+    }
+    .trace-panel{
+      padding:16px;
+      margin-bottom:16px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(6,14,27,.54);
+    }
+    .trace-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .trace-head strong{font-size:12px;letter-spacing:.04em}
+    .trace-sub{color:var(--muted);font-size:10px}
+    .trace-path{
+      display:grid;
+      grid-template-columns:auto minmax(28px,1fr) auto minmax(28px,1fr) auto minmax(28px,1fr) auto;
+      align-items:center;
+      gap:8px;
+    }
+    .trace-node{
+      min-width:112px;
+      padding:11px 10px;
+      border:1px solid var(--border);
+      border-radius:11px;
+      background:#0b1628;
+      text-align:center;
+    }
+    .trace-node .n{font-size:11px;font-weight:900}
+    .trace-node .s{margin-top:4px;color:var(--muted);font-size:9px}
+    .trace-node.good{border-color:rgba(77,227,155,.34);box-shadow:inset 0 0 20px rgba(77,227,155,.035)}
+    .trace-node.good .n{color:var(--green)}
+    .trace-node.bad{border-color:rgba(255,107,126,.34);box-shadow:inset 0 0 20px rgba(255,107,126,.035)}
+    .trace-node.bad .n{color:var(--red)}
+    .trace-node.warn{border-color:rgba(248,198,92,.34)}
+    .trace-node.warn .n{color:var(--yellow)}
+    .trace-link{
+      position:relative;
+      height:2px;
+      min-width:28px;
+      overflow:hidden;
+      border-radius:999px;
+      background:#263653;
+    }
+    .trace-link.active{background:rgba(77,227,155,.28)}
+    .trace-link.active:after{
+      content:"";
+      position:absolute;
+      top:0;
+      bottom:0;
+      width:34%;
+      background:linear-gradient(90deg,transparent,var(--green),transparent);
+      animation:traceFlow 1.35s linear infinite;
+    }
+    .trace-link.blocked{
+      background:repeating-linear-gradient(90deg,rgba(255,107,126,.55) 0 7px,transparent 7px 12px);
+    }
+    .trace-link.enforced{
+      background:repeating-linear-gradient(90deg,rgba(77,227,155,.55) 0 7px,transparent 7px 12px);
+    }
+    @keyframes traceFlow{from{left:-34%}to{left:100%}}
+    .inspector-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .inspect-card{
+      padding:14px;
+      border:1px solid var(--border);
+      border-radius:13px;
+      background:rgba(7,16,31,.5);
+    }
+    .inspect-card.wide{grid-column:1/-1}
+    .inspect-card h4{
+      margin:0 0 10px;
+      color:#bfd0e7;
+      font-size:11px;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+    }
+    .kv-grid{
+      display:grid;
+      grid-template-columns:minmax(120px,.8fr) minmax(0,1.2fr);
+      gap:7px 12px;
+      font-size:11px;
+    }
+    .kv-grid .k{color:#7187a7}
+    .kv-grid .v{color:#d9e6f6;word-break:break-word}
+    .kv-grid .v.mono{font-family:"SFMono-Regular",Consolas,monospace}
+    .evidence-list{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:7px 10px;
+    }
+    .evidence-item{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 9px;
+      border:1px solid var(--border);
+      border-radius:9px;
+      background:rgba(8,17,32,.5);
+      font-size:10px;
+    }
+    .evidence-icon{width:16px;text-align:center;font-weight:900}
+    .evidence-item.good .evidence-icon{color:var(--green)}
+    .evidence-item.bad .evidence-icon{color:var(--red)}
+    .evidence-item.neutral .evidence-icon{color:#7187a7}
+    .muted{color:var(--muted)}
+    .copy-id-btn{
+      border:0;
+      background:transparent;
+      color:var(--cyan);
+      cursor:pointer;
+      font-size:10px;
+      padding:0;
+    }
+    @media (max-width:850px){
+      .trace-path{
+        grid-template-columns:1fr;
+      }
+      .trace-link{
+        width:2px;
+        height:22px;
+        margin:auto;
+      }
+      .trace-link.active:after{
+        left:0;
+        right:0;
+        width:auto;
+        height:34%;
+        background:linear-gradient(180deg,transparent,var(--green),transparent);
+        animation:traceFlowVertical 1.35s linear infinite;
+      }
+      @keyframes traceFlowVertical{from{top:-34%}to{top:100%}}
+      .inspector-grid,.evidence-list{grid-template-columns:1fr}
+      .inspector-time{width:100%;margin-left:0}
+    }
+  
+    /* ==========================================================
+       FINAL VISUAL POLISH — readable screenshots + filled hero
+       ========================================================== */
+    .hero > .panel:nth-child(2){
+      display:flex;
+      flex-direction:column;
+    }
+    .hero-overview{
+      margin:0 16px 16px;
+      padding:18px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:
+        radial-gradient(circle at 86% 12%,rgba(66,213,255,.07),transparent 28%),
+        linear-gradient(145deg,rgba(8,17,32,.82),rgba(11,21,38,.68));
+      flex:1;
+      min-height:280px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .hero-overview-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .hero-overview-head h3{
+      margin:2px 0 0;
+      font-size:18px;
+      letter-spacing:-.02em;
+    }
+    .hero-overview-grid{
+      display:grid;
+      grid-template-columns:minmax(300px,.9fr) minmax(380px,1.25fr);
+      gap:18px;
+      align-items:stretch;
+    }
+    .overview-copy{
+      display:grid;
+      gap:9px;
+    }
+    .overview-item{
+      display:grid;
+      grid-template-columns:34px 1fr;
+      gap:11px;
+      padding:11px 12px;
+      border:1px solid rgba(133,157,191,.14);
+      border-radius:12px;
+      background:rgba(255,255,255,.018);
+    }
+    .overview-index{
+      width:30px;
+      height:30px;
+      display:grid;
+      place-items:center;
+      border-radius:9px;
+      color:var(--cyan);
+      border:1px solid rgba(66,213,255,.22);
+      background:rgba(66,213,255,.05);
+      font:800 10px "Cascadia Code","Consolas",monospace;
+    }
+    .overview-item strong{
+      font-size:13px;
+    }
+    .overview-item p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .overview-route{
+      border:1px solid rgba(133,157,191,.14);
+      border-radius:14px;
+      padding:16px;
+      background:rgba(4,10,20,.32);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .route-caption{
+      margin-bottom:16px;
+      color:#7f91aa;
+      font:800 10px "Cascadia Code","Consolas",monospace;
+      letter-spacing:.12em;
+    }
+    .route-track{
+      display:grid;
+      grid-template-columns:auto 1fr auto 1fr auto 1fr auto;
+      align-items:center;
+      gap:8px;
+    }
+    .route-node{
+      min-width:86px;
+      min-height:64px;
+      border:1px solid rgba(66,213,255,.22);
+      border-radius:12px;
+      padding:10px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      background:rgba(66,213,255,.035);
+    }
+    .route-node.opa{
+      border-color:rgba(77,227,155,.30);
+      background:rgba(77,227,155,.05);
+      box-shadow:0 0 30px rgba(77,227,155,.04);
+    }
+    .route-node span{
+      color:#7386a1;
+      font:800 8px "Cascadia Code","Consolas",monospace;
+      letter-spacing:.10em;
+    }
+    .route-node strong{
+      margin-top:3px;
+      font-size:12px;
+    }
+    .route-link{
+      position:relative;
+      height:1px;
+      background:linear-gradient(90deg,rgba(66,213,255,.25),rgba(77,227,155,.6));
+      overflow:hidden;
+    }
+    .route-link i{
+      position:absolute;
+      top:-2px;
+      left:-18px;
+      width:18px;
+      height:5px;
+      border-radius:99px;
+      background:linear-gradient(90deg,transparent,#68e9ff,transparent);
+      animation:routeFlow 2.4s linear infinite;
+      opacity:.75;
+    }
+    .route-link.gated{
+      background:linear-gradient(90deg,rgba(77,227,155,.55),rgba(66,213,255,.20));
+    }
+    @keyframes routeFlow{
+      from{left:-20px}
+      to{left:calc(100% + 20px)}
+    }
+    .route-note{
+      margin:15px 0 0;
+      color:#91a1b7;
+      font-size:12px;
+      line-height:1.5;
+    }
+    @media (max-width:1180px){
+      .hero-overview-grid{grid-template-columns:1fr}
+      .route-track{grid-template-columns:auto 1fr auto 1fr auto 1fr auto}
+    }
+    @media (max-width:760px){
+      .hero-overview-head{display:grid}
+      .route-track{grid-template-columns:1fr;gap:7px}
+      .route-link{height:18px;width:1px;justify-self:center}
+      .route-link i{display:none}
+    }
+
+
+    /* ==========================================================
+       V1.4 FINAL UI SEMANTIC POLISH
+       ========================================================== */
+    .topbar-actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .portal-shortcut{
+      border:1px solid rgba(66,213,255,.22);
+      border-radius:12px;
+      padding:7px 10px;
+      background:rgba(66,213,255,.035);
+      color:#d9f8ff;
+      cursor:pointer;
+      transition:transform .18s ease,border-color .18s ease,background .18s ease;
+    }
+    .portal-shortcut:hover{
+      transform:translateY(-1px);
+      border-color:rgba(66,213,255,.42);
+      background:rgba(66,213,255,.07);
+    }
+    .portal-shortcut span{
+      display:grid;
+      gap:1px;
+      text-align:left;
+    }
+    .portal-shortcut strong{
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    .portal-shortcut small{
+      color:#6f87a7;
+      font:700 8px/1.1 "Cascadia Code","Consolas",monospace;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .timeline-legend{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin:3px 8px 12px;
+      padding:9px 10px;
+      border:1px solid rgba(38,54,83,.72);
+      border-radius:10px;
+      background:rgba(7,16,31,.42);
+      color:#8fa1b9;
+      font-size:10px;
+    }
+    .timeline-legend > span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+    .timeline-legend small{
+      margin-left:auto;
+      color:#6f819c;
+      font-size:9px;
+    }
+    .legend-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      display:inline-block;
+      box-shadow:0 0 10px currentColor;
+    }
+    .legend-dot.healthy{
+      color:var(--green);
+      background:var(--green);
+    }
+    .legend-dot.degraded{
+      color:var(--red);
+      background:var(--red);
+    }
+    .legend-bar{
+      display:inline-block;
+      width:10px;
+      height:14px;
+      border:1px solid rgba(66,213,255,.34);
+      border-radius:3px 3px 2px 2px;
+      background:linear-gradient(180deg,rgba(66,213,255,.58),rgba(66,213,255,.14));
+    }
+    .hero-overview .route-link i{
+      will-change:left;
+    }
+    @media (max-width:760px){
+      .topbar-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .timeline-legend small{
+        width:100%;
+        margin-left:0;
+      }
+    }
+
+
+
+/* V1.5 IDENTITY GOVERNANCE UI */
+.identity-launch{
+  border-color:rgba(66,213,255,.34)!important;
+  background:rgba(66,213,255,.055)!important;
+}
+.identity-workspace-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:2200;
+  display:none;
+  overflow:auto;
+  padding:20px;
+  background:
+    radial-gradient(circle at 18% 10%,rgba(55,139,255,.13),transparent 34%),
+    rgba(2,7,16,.91);
+  backdrop-filter:blur(12px);
+}
+.identity-workspace-backdrop.open{display:block}
+.identity-workspace{
+  width:min(1180px,100%);
+  min-height:min(760px,calc(100vh - 40px));
+  margin:0 auto;
+  overflow:hidden;
+  border:1px solid #294665;
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(13,29,52,.985),rgba(5,14,28,.99));
+  box-shadow:0 30px 90px rgba(0,0,0,.52);
+}
+.identity-workspace-head{
+  position:sticky;
+  top:0;
+  z-index:4;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  background:rgba(7,18,35,.965);
+  backdrop-filter:blur(12px);
+}
+.identity-workspace-head h2{margin:3px 0 0;font-size:20px;letter-spacing:-.02em}
+.identity-workspace-head p{margin:5px 0 0;color:var(--muted);font-size:11px}
+.identity-workspace-close{
+  width:40px;height:40px;border:1px solid var(--border-strong);
+  border-radius:11px;background:#0b1a30;color:var(--text);
+  font-size:22px;cursor:pointer;
+}
+.identity-workspace-body{padding:18px}
+.identity-overview{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+.identity-overview-card{
+  padding:12px 14px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(8,18,34,.62);
+}
+.identity-overview-card span{
+  display:block;color:var(--muted);font-size:10px;
+  text-transform:uppercase;letter-spacing:.12em;
+}
+.identity-overview-card strong{display:block;margin-top:6px;font-size:14px}
+.identity-guidance{
+  margin-bottom:14px;padding:12px 14px;
+  border:1px solid rgba(66,213,255,.22);
+  border-radius:13px;background:rgba(66,213,255,.045);
+  color:#b8deee;font-size:12px;line-height:1.55;
+}
+.identity-grid{
+  display:grid;
+  grid-template-columns:minmax(350px,.9fr) minmax(0,1.6fr);
+  gap:14px;
+}
+.identity-card{
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:15px;
+  background:linear-gradient(180deg,rgba(16,31,55,.72),rgba(7,16,31,.58));
+}
+.identity-card-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;margin-bottom:14px;
+}
+.identity-card-title{font-size:14px;font-weight:900}
+.identity-card-sub{margin-top:4px;color:var(--muted);font-size:11px;line-height:1.45}
+.identity-form{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.identity-form .field.full{grid-column:1/-1}
+.identity-form input{width:100%;box-sizing:border-box}
+.identity-role-lock{
+  grid-column:1/-1;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 12px;
+  border:1px solid rgba(66,213,255,.20);
+  border-radius:12px;
+  background:rgba(66,213,255,.045);
+}
+.identity-role-lock strong{
+  display:block;color:var(--cyan);letter-spacing:.08em;font-size:12px;
+}
+.identity-role-lock span{color:var(--muted);font-size:11px;line-height:1.4}
+.identity-note{margin-top:11px;color:#8ea4c2;font-size:11px;line-height:1.5}
+.identity-roster{display:grid;gap:9px}
+.identity-user{
+  display:grid;
+  grid-template-columns:minmax(150px,.78fr) minmax(230px,1.15fr) auto;
+  gap:12px;align-items:center;
+  padding:12px 13px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(8,17,32,.54);
+}
+.identity-user:hover{border-color:#304463}
+.identity-user-name{font-size:13px;font-weight:900}
+.identity-user-meta{margin-top:4px;color:var(--muted);font-size:10px;line-height:1.45}
+.identity-user-signals{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.identity-user-actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.identity-user-actions .btn{padding:8px 10px;font-size:10px}
+.identity-empty{
+  padding:22px;
+  border:1px dashed var(--border-strong);
+  border-radius:13px;
+  color:var(--muted);
+  text-align:center;
+  font-size:12px;
+}
+.role-confirm-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:2600;
+  display:none;
+  place-items:center;
+  padding:20px;
+  background:rgba(2,7,16,.72);
+  backdrop-filter:blur(9px);
+}
+.role-confirm-backdrop.open{display:grid}
+.role-confirm-modal{
+  position:relative;
+  width:min(590px,100%);
+  overflow:hidden;
+  border:1px solid #315477;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(14,31,55,.99),rgba(6,16,31,.995));
+  box-shadow:0 30px 90px rgba(0,0,0,.58),0 0 0 1px rgba(66,213,255,.03) inset;
+  animation:roleModalIn .16s ease-out;
+}
+@keyframes roleModalIn{
+  from{opacity:0;transform:translateY(8px) scale(.985)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.role-confirm-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding:20px 20px 16px;
+  border-bottom:1px solid var(--border);
+  background:rgba(7,18,35,.78);
+}
+.role-confirm-head h3{margin:4px 0 0;font-size:20px;letter-spacing:-.02em}
+.role-confirm-close{
+  flex:0 0 auto;
+  width:38px;
+  height:38px;
+  border:1px solid var(--border-strong);
+  border-radius:11px;
+  background:#0b1a30;
+  color:var(--text);
+  font-size:21px;
+  cursor:pointer;
+}
+.role-confirm-body{padding:18px 20px 20px}
+.role-confirm-message{
+  margin:0 0 14px;
+  color:#c8d7eb;
+  font-size:13px;
+  line-height:1.6;
+}
+.role-change-flow{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+.role-state{
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(8,18,34,.66);
+}
+.role-state span{
+  display:block;
+  color:var(--muted);
+  font:800 9px "Cascadia Code","Consolas",monospace;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+.role-state strong{display:block;margin-top:6px;font-size:14px}
+.role-change-arrow{color:var(--cyan);font-size:18px;font-weight:900}
+.role-confirm-context{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-bottom:14px;
+}
+.role-context-item{
+  padding:10px 12px;
+  border:1px solid rgba(38,54,83,.88);
+  border-radius:11px;
+  background:rgba(7,16,31,.50);
+}
+.role-context-item span{
+  display:block;
+  color:#7489a6;
+  font:800 9px "Cascadia Code","Consolas",monospace;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+.role-context-item strong{display:block;margin-top:5px;font-size:12px}
+.role-confirm-guidance{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  margin-bottom:18px;
+  padding:11px 12px;
+  border:1px solid rgba(66,213,255,.19);
+  border-radius:12px;
+  background:rgba(66,213,255,.045);
+  color:#a9cae0;
+  font-size:11px;
+  line-height:1.55;
+}
+.role-confirm-guidance .signal{
+  width:8px;
+  height:8px;
+  flex:0 0 auto;
+  margin-top:4px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 12px rgba(66,213,255,.7);
+}
+.role-confirm-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  flex-wrap:wrap;
+}
+.role-confirm-actions .btn{min-width:118px}
+.role-confirm-actions .btn.primary{min-width:150px}
+.role-confirm-actions .btn[disabled]{opacity:.55;cursor:wait;transform:none}
+body.role-modal-open{overflow:hidden}
+@media(max-width:900px){
+  .identity-overview{grid-template-columns:1fr}
+  .identity-grid{grid-template-columns:1fr}
+  .identity-user{grid-template-columns:1fr}
+  .identity-user-actions{justify-content:flex-start}
+}
+@media(max-width:560px){
+  .identity-workspace-backdrop{padding:8px}
+  .identity-workspace{min-height:calc(100vh - 16px)}
+  .identity-form{grid-template-columns:1fr}
+  .role-confirm-backdrop{padding:10px}
+  .role-confirm-context{grid-template-columns:1fr}
+  .role-change-flow{grid-template-columns:1fr}
+  .role-change-arrow{transform:rotate(90deg);justify-self:center}
+  .role-confirm-actions{display:grid;grid-template-columns:1fr}
+  .role-confirm-actions .btn{width:100%}
+}
+
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">🛡️</div>
+      <div>
+        <h1>Zero Trust Security Center</h1>
+        <p>SOC Control Plane · Continuous Device Trust · Evidence-first access control</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      
+      <button
+        class="portal-shortcut identity-launch"
+        type="button"
+        onclick="openIdentityWorkspace()"
+        title="Open the Identity & Access administration workspace."
+      >
+        <span>
+          <strong>Identity & Access ↗</strong>
+          <small>admin workspace</small>
+        </span>
+      </button>
+<button
+        class="portal-shortcut"
+        type="button"
+        onclick="window.open('http://localhost:8082','_blank')"
+        title="Convenience link only — users can open Data Vault directly."
+      >
+        <span>
+          <strong>Open user portal ↗</strong>
+          <small>demo shortcut</small>
+        </span>
+      </button>
+      <div id="systemPill" class="system-pill">
+        <span id="systemPulse" class="pulse"></span>
+        <span id="systemState">Waiting for SOC admin session</span>
+      </div>
+    </div>
+  </header>
+  <section class="hero">
+    <article class="panel">
+      <div class="panel-inner">
+        <div class="section-title">
+          <div>
+            <div class="eyebrow">SOC Operator Identity</div>
+            <h2>Security Admin Session</h2>
+          </div>
+          <span id="jwtBadge" class="badge neutral">No token</span>
+        </div>
+        <div class="login-grid">
+          <div class="field">
+            <label for="username">Admin username</label>
+            <input id="username" value="socadmin" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="password">Admin password</label>
+            <input id="password" type="password" value="socadmin123" autocomplete="current-password">
+          </div>
+          <div class="field">
+            <label for="authDeviceId">Admin console device</label>
+            <input id="authDeviceId" value="SOC-001">
+          </div>
+          <div class="field">
+            <label for="deviceId">Monitored device</label>
+            <input id="deviceId" value="DEV-001">
+          </div>
+          <div class="btn-row">
+            <button class="btn primary" onclick="login()">Authenticate Admin</button>
+            <button class="btn" onclick="refreshAll()">Refresh All</button>
+          </div>
+        </div>
+        <div class="session-box">
+          <div class="session-line"><span>Operator</span><strong id="sessionUser">—</strong></div>
+          <div class="session-line"><span>Role</span><strong id="sessionRole">—</strong></div>
+          <div class="session-line"><span>Token TTL</span><strong id="sessionTtl">—</strong></div>
+          <div class="session-line"><span>Console Device</span><strong id="sessionDevice">—</strong></div>
+          <div class="session-line"><span>Monitoring</span><strong id="sessionTarget">—</strong></div>
+        </div>
+      </div>
+    </article>
+    <article class="panel">
+      <div class="summary">
+        <div id="decisionMetric" class="metric">
+          <div class="label">Latest Observed Decision</div>
+          <div id="metricDecision" class="value">No observed access</div>
+          <div id="metricReason" class="sub">Authenticate as SOC admin, then observe Data Vault access.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Device Trust</div>
+          <div id="metricTrust" class="value">Unknown</div>
+          <div id="metricTrustSub" class="sub">No posture loaded.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Heartbeat</div>
+          <div id="metricHeartbeat" class="value">Unknown</div>
+          <div id="metricHeartbeatSub" class="sub">Waiting for Device Agent telemetry.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Patch Evidence</div>
+          <div id="metricPatch" class="value">Unknown</div>
+          <div id="metricPatchSub" class="sub">No hotfix evidence loaded.</div>
+        </div>
+      </div>
+      <div class="hero-overview">
+        <div class="hero-overview-head">
+          <div>
+            <div class="eyebrow">Enforcement Architecture</div>
+            <h3>Policy path &amp; separation of duties.</h3>
+          </div>
+          <span class="badge neutral">SEPARATION OF DUTIES</span>
+        </div>
+
+        <div class="hero-overview-grid">
+          <div class="overview-copy">
+            <div class="overview-item">
+              <span class="overview-index">01</span>
+              <div>
+                <strong>Data Vault user</strong>
+                <p>Business user requests protected data.</p>
+              </div>
+            </div>
+            <div class="overview-item">
+              <span class="overview-index">02</span>
+              <div>
+                <strong>SOC operator</strong>
+                <p>Observes evidence and changes managed trust state; does not approve each request manually.</p>
+              </div>
+            </div>
+            <div class="overview-item">
+              <span class="overview-index">03</span>
+              <div>
+                <strong>OPA policy decision</strong>
+                <p>Identity + device + context + sensitivity produce the authoritative ALLOW / DENY result.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="overview-route">
+            <div class="route-caption">REFERENCE REQUEST PATH · ANIMATED</div>
+            <div class="route-track">
+              <div class="route-node">
+                <span>USER</span>
+                <strong>Data Vault</strong>
+              </div>
+              <div class="route-link"><i></i></div>
+              <div class="route-node">
+                <span>PEP</span>
+                <strong>Access Proxy</strong>
+              </div>
+              <div class="route-link"><i></i></div>
+              <div class="route-node opa">
+                <span>PDP</span>
+                <strong>OPA</strong>
+              </div>
+              <div class="route-link gated"><i></i></div>
+              <div class="route-node">
+                <span>RESOURCE</span>
+                <strong>Data API</strong>
+              </div>
+            </div>
+            <p class="route-note">Animated flow illustrates the architecture only. Sensitive payload is fetched after ALLOW; request-specific proof lives in Decision Inspector.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+  <section class="content-grid">
+    <article class="panel">
+      <div class="panel-inner">
+        <div class="section-title">
+          <div>
+            <div class="eyebrow">Device</div>
+            <h3>Continuous Posture</h3>
+          </div>
+          <span id="trustBadge" class="badge neutral">Unknown</span>
+        </div>
+        <div class="trust-hero">
+          <div>
+            <div id="deviceName" class="big">No device loaded</div>
+            <div id="deviceMeta" style="color:var(--muted);font-size:12px;margin-top:5px">
+              Run the agent and authenticate.
+            </div>
+          </div>
+        </div>
+        <div class="facts">
+          <div class="fact"><span>Firewall</span><strong id="factFirewall">—</strong></div>
+          <div class="fact"><span>Latest Hotfix</span><strong id="factHotfix">—</strong></div>
+          <div class="fact"><span>Patch Age</span><strong id="factPatchAge">—</strong></div>
+          <div class="fact"><span>Pending Reboot</span><strong id="factReboot">—</strong></div>
+          <div class="fact"><span>Agent Version</span><strong id="factAgent">—</strong></div>
+          <div class="fact"><span>Last Seen</span><strong id="factLastSeen">—</strong></div>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn" onclick="loadDevices()">Refresh Posture</button>
+        </div>
+      </div>
+    </article>
+    <article class="panel">
+      <div class="panel-inner">
+        <div class="section-title">
+          <div>
+            <div class="eyebrow">Policy Inputs</div>
+            <h3>Monitored Zero Trust inputs</h3>
+          </div>
+        </div>
+        <div id="checkList" class="check-list"></div>
+      </div>
+    </article>
+    <article class="panel decision-card">
+      <div class="panel-inner" style="height:100%;display:flex;flex-direction:column">
+        <div class="section-title">
+          <div>
+            <div class="eyebrow">Observed Policy Decision</div>
+            <h3>Latest Data Vault Access</h3>
+          </div>
+          <span class="badge neutral">HISTORICAL AUDIT</span>
+        </div>
+        <div id="decisionFreshness" class="decision-freshness">
+          <div class="icon">!</div>
+          <div>
+            <strong>Current security state changed</strong>
+            <span id="decisionFreshnessText">
+              The latest observed decision is historical. The next Data Vault request will be evaluated against the current state.
+            </span>
+          </div>
+        </div>
+        <div class="decision-main">
+          <div>
+            <div class="eyebrow">Latest Observed Decision</div>
+            <div id="decisionWord" class="decision-word idle">IDLE</div>
+          </div>
+          <span id="decisionHttp" class="badge neutral">No request</span>
+        </div>
+        <div class="reason-box">
+          <div class="reason-label">Decision reason</div>
+          <div id="decisionReason" class="reason">No observed decision</div>
+        </div>
+        <div class="protected-preview">
+          <div class="eyebrow">Decision source</div>
+          <div id="protectedRecords" class="records">
+            <div class="empty">Protected-resource requests originate in Data Vault. Use Decision Inspector to verify persisted evidence.</div>
+          </div>
+        </div>
+        <details class="raw-details">
+          <summary>Latest observed audit record</summary>
+          <pre id="rawDecision">No Data Vault decision observed yet.</pre>
+        </details>
+      </div>
+    </article>
+  </section>
+<section class="panel demo-panel">
+  <div class="panel-inner">
+    <div class="section-title">
+      <div>
+        <div class="eyebrow">
+          Demo Control Plane
+        </div>
+        <h3>
+          Zero Trust Demo Controls
+        </h3>
+      </div>
+      <span
+        id="demoControlBadge"
+        class="badge neutral"
+      >
+        Not loaded
+      </span>
+    </div>
+    <div class="demo-note">
+      DEMO CONTROL PLANE:
+      SOC Admin changes security control state; OPA still makes each ALLOW/DENY decision automatically.
+      Device Trust changes the gateway trust state.
+      Firewall, Patch and Heartbeat simulate telemetry conditions only.
+      Real Windows Firewall and Windows Update settings are not modified.
+    </div>
+    <div class="demo-grid">
+      <div class="demo-control">
+        <div class="demo-control-top">
+          <div>
+            <div class="demo-control-title">
+              Device Trust
+            </div>
+            <div class="demo-control-sub">
+              Real gateway trust-state control.
+            </div>
+          </div>
+          <span
+            id="demoTrustState"
+            class="badge neutral"
+          >
+            Unknown
+          </span>
+        </div>
+        <div class="btn-row">
+          <button
+            class="btn good"
+            onclick="setTrust('trusted')"
+          >
+            TRUSTED
+          </button>
+          <button
+            class="btn danger"
+            onclick="setTrust('untrusted')"
+          >
+            REVOKE
+          </button>
+        </div>
+      </div>
+      <div class="demo-control">
+        <div class="demo-control-top">
+          <div>
+            <div class="demo-control-title">
+              Firewall Telemetry
+            </div>
+            <div class="demo-control-sub">
+              Simulate enabled or disabled posture.
+            </div>
+          </div>
+          <span
+            id="demoFirewallState"
+            class="badge neutral"
+          >
+            Unknown
+          </span>
+        </div>
+        <div class="btn-row">
+          <button
+            class="btn good"
+            onclick="
+              updateDemoControl(
+                {
+                  simulate_firewall_disabled:false
+                },
+                'Firewall simulation cleared'
+              )
+            "
+          >
+            NORMAL
+          </button>
+          <button
+            class="btn danger"
+            onclick="
+              updateDemoControl(
+                {
+                  simulate_firewall_disabled:true
+                },
+                'Firewall OFF simulation requested'
+              )
+            "
+          >
+            SIMULATE OFF
+          </button>
+        </div>
+      </div>
+      <div class="demo-control">
+        <div class="demo-control-top">
+          <div>
+            <div class="demo-control-title">
+              Patch Evidence
+            </div>
+            <div class="demo-control-sub">
+              NORMAL uses real agent-reported patch evidence; SIMULATE OLD overrides it for the demo.
+            </div>
+          </div>
+          <span
+            id="demoPatchState"
+            class="badge neutral"
+          >
+            Unknown
+          </span>
+        </div>
+        <div class="btn-row">
+          <button
+            class="btn good"
+            onclick="
+              updateDemoControl(
+                {
+                  simulate_patch_outdated:false
+                },
+                'Patch simulation cleared'
+              )
+            "
+          >
+            NORMAL
+          </button>
+          <button
+            class="btn danger"
+            onclick="
+              updateDemoControl(
+                {
+                  simulate_patch_outdated:true
+                },
+                'Outdated patch simulation requested'
+              )
+            "
+          >
+            SIMULATE OLD
+          </button>
+        </div>
+      </div>
+      <div class="demo-control">
+        <div class="demo-control-top">
+          <div>
+            <div class="demo-control-title">
+              Heartbeat
+            </div>
+            <div class="demo-control-sub">
+              Keep agent alive while pausing posture delivery.
+            </div>
+          </div>
+          <span
+            id="demoHeartbeatState"
+            class="badge neutral"
+          >
+            Unknown
+          </span>
+        </div>
+        <div class="btn-row">
+          <button
+            class="btn good"
+            onclick="
+              updateDemoControl(
+                {
+                  simulate_agent_loss:false
+                },
+                'Agent-loss simulation cleared'
+              )
+            "
+          >
+            NORMAL
+          </button>
+          <button
+            class="btn danger"
+            onclick="
+              updateDemoControl(
+                {
+                  simulate_agent_loss:true
+                },
+                'Agent-loss simulation requested'
+              )
+            "
+          >
+            SIMULATE LOSS
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="demo-footer">
+      <div
+        id="demoControlUpdated"
+        class="demo-updated"
+      >
+        Desired state not loaded.
+      </div>
+      <button
+        class="btn good"
+        onclick="resetDemoBaseline()"
+      >
+        RESET DEMO BASELINE
+      </button>
+    </div>
+  </div>
+</section>
+<section class="panel event-panel">
+  <div class="panel-inner">
+    <div class="section-title">
+      <div>
+        <div class="eyebrow">Security Correlation View</div>
+        <h3>Security Event Timeline</h3>
+      </div>
+      <div class="event-toolbar">
+        <span id="eventModeBadge" class="badge good">
+            Persisted + telemetry
+        </span>
+        <button class="btn" onclick="refreshSecurityEvents()">Refresh Events</button>
+      </div>
+    </div>
+    <div class="event-summary">
+      <div class="event-stat"><div class="k">Visible Events</div><div id="eventCount" class="v info">0</div></div>
+      <div class="event-stat"><div class="k">Access Denies</div><div id="eventDenyCount" class="v bad">0</div></div>
+      <div class="event-stat"><div class="k">Security Changes</div><div id="eventPostureCount" class="v warn">0</div></div>
+      <div class="event-stat"><div class="k">Latest Signal</div><div id="eventLatest" class="v good">—</div></div>
+    </div>
+    <div id="securityEventFeed" class="event-feed">
+      <div class="empty">Authenticate to build a correlated security timeline.</div>
+    </div>
+    <details class="raw-details">
+      <summary>How this timeline is built</summary>
+      <pre id="eventExplain">Persisted security transitions come from /events backed by PostgreSQL security_events. Access decisions come from /logs. Device posture evidence comes from append-only posture history. Live-only warnings are used only when persisted evidence is not available yet.</pre>
+    </details>
+  </div>
+</section>
+<section class="lower-grid">
+    <article class="panel">
+      <div class="panel-inner">
+        <div class="section-title">
+          <div>
+            <div class="eyebrow">Data Engineering View</div>
+            <h3>Device Posture Evidence Timeline</h3>
+          </div>
+          <button class="btn" onclick="loadPostureHistory()">Refresh History</button>
+        </div>
+        <div id="timeline" class="timeline">
+          <div class="empty">No posture history loaded.</div>
+        </div>
+        <div class="timeline-legend" aria-label="Device posture timeline legend">
+          <span><i class="legend-dot healthy"></i>Healthy posture</span>
+          <span><i class="legend-dot degraded"></i>Degraded posture</span>
+          <span><i class="legend-bar"></i>Bar height = patch recency</span>
+          <small>Trust changes and access decisions are shown separately in the Security Event Timeline.</small>
+        </div>
+        <details class="raw-details">
+          <summary>Latest posture history JSON</summary>
+          <pre id="rawHistory">No history loaded.</pre>
+        </details>
+      </div>
+    </article>
+    <article class="panel">
+      <div class="panel-inner">
+        <div class="section-title">
+          <div>
+            <div class="eyebrow">Audit Trail</div>
+            <h3>Recent Access Decisions</h3>
+          </div>
+          <button class="btn" onclick="loadLogs()">Refresh Logs</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Decision</th>
+                <th>Reason</th>
+                <th>Trace</th>
+              </tr>
+            </thead>
+            <tbody id="auditBody">
+              <tr><td colspan="5" class="empty">No audit events loaded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </article>
+  </section>
+</main>
+
+<div id="identityWorkspaceBackdrop" class="identity-workspace-backdrop" aria-hidden="true">
+  <section
+    class="identity-workspace"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="identityWorkspaceTitle"
+  >
+    <div class="identity-workspace-head">
+      <div>
+        <div class="eyebrow">Identity Governance · V1.5</div>
+        <h2 id="identityWorkspaceTitle">Identity & Access Administration</h2>
+        <p>Least privilege · Business-role governance · Managed-device enrollment</p>
+      </div>
+      <button
+        class="identity-workspace-close"
+        type="button"
+        aria-label="Close Identity & Access workspace"
+        onclick="closeIdentityWorkspace()"
+      >×</button>
+    </div>
+
+    <div class="identity-workspace-body">
+      <div class="identity-overview">
+        <div class="identity-overview-card">
+          <span>Default business role</span>
+          <strong>VIEWER · Least privilege</strong>
+        </div>
+        <div class="identity-overview-card">
+          <span>Elevated business role</span>
+          <strong>ANALYST · Need-to-know elevation</strong>
+        </div>
+        <div class="identity-overview-card">
+          <span>Protected control role</span>
+          <strong>SECURITY-ADMIN · Protected control-plane role</strong>
+        </div>
+      </div>
+
+      <div class="identity-guidance">
+        New business identities are provisioned as <strong>VIEWER</strong> by default under least privilege.
+        Managed devices start <strong>UNTRUSTED</strong> and require Device Agent telemetry plus an explicit trust decision.
+        <strong>ANALYST</strong> eligibility is granted by the SOC administrator only when job function / need-to-know justifies HIGH-data access.
+        <strong>SECURITY-ADMIN</strong> is a protected control-plane role and is not assignable from this workflow.
+      </div>
+
+      <div class="identity-grid">
+        <div class="identity-card">
+          <div class="identity-card-head">
+            <div>
+              <div class="identity-card-title">Provision business identity</div>
+              <div class="identity-card-sub">
+                Create one business user and bind one managed device without bypassing Zero Trust policy.
+              </div>
+            </div>
+            <span class="badge info">NEW USER</span>
+          </div>
+
+          <div class="identity-form">
+            <div class="field">
+              <label>Username</label>
+              <input id="provUsername" placeholder="e.g. minh" autocomplete="off">
+            </div>
+            <div class="field">
+              <label>Temporary password</label>
+              <input id="provPassword" type="password" placeholder="minimum 8 characters" autocomplete="new-password">
+            </div>
+            <div class="field">
+              <label>Device ID</label>
+              <input id="provDeviceId" placeholder="e.g. DEV-003" autocomplete="off">
+            </div>
+            <div class="field">
+              <label>Device name</label>
+              <input id="provDeviceName" placeholder="e.g. Minh Managed Laptop" autocomplete="off">
+            </div>
+
+            <div class="identity-role-lock">
+              <div>
+                <strong>INITIAL ROLE · VIEWER</strong>
+                <span>Fixed at provisioning time to enforce least privilege.</span>
+              </div>
+              <span class="badge neutral">LOCKED</span>
+            </div>
+
+            <div class="field full">
+              <button class="btn primary" type="button" onclick="provisionUser()">
+                PROVISION USER + DEVICE
+              </button>
+            </div>
+          </div>
+
+          <div class="identity-note">
+            After provisioning, use COPY AGENT CMD for the new Device ID.
+            Business role and device trust stay as separate security controls.
+          </div>
+        </div>
+
+        <div class="identity-card">
+          <div class="identity-card-head">
+            <div>
+              <div class="identity-card-title">Managed business identities</div>
+              <div class="identity-card-sub">
+                Business-role changes are limited to VIEWER ↔ ANALYST. SECURITY-ADMIN remains out-of-band / bootstrap only.
+              </div>
+            </div>
+            <button class="btn" type="button" onclick="loadManagedUsers()">REFRESH</button>
+          </div>
+
+          <div id="managedUsers" class="identity-roster">
+            <div class="identity-empty">
+              Authenticate as SOC admin, then open this workspace.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="roleConfirmBackdrop" class="role-confirm-backdrop" aria-hidden="true">
+  <section
+    class="role-confirm-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="roleConfirmTitle"
+    aria-describedby="roleConfirmMessage"
+  >
+    <div class="role-confirm-head">
+      <div>
+        <div class="eyebrow">Identity Governance · Approval</div>
+        <h3 id="roleConfirmTitle">Confirm business-role change</h3>
+      </div>
+      <button
+        class="role-confirm-close"
+        type="button"
+        aria-label="Cancel role change"
+        onclick="closeRoleConfirmModal()"
+      >×</button>
+    </div>
+    <div class="role-confirm-body">
+      <p id="roleConfirmMessage" class="role-confirm-message">
+        Review the current identity and device context before applying this role change.
+      </p>
+
+      <div class="role-change-flow" aria-label="Role change summary">
+        <div class="role-state">
+          <span>Current role</span>
+          <strong id="roleConfirmCurrentRole">VIEWER</strong>
+        </div>
+        <div class="role-change-arrow" aria-hidden="true">→</div>
+        <div class="role-state">
+          <span>Target role</span>
+          <strong id="roleConfirmTargetRole">ANALYST</strong>
+        </div>
+      </div>
+
+      <div class="role-confirm-context">
+        <div class="role-context-item">
+          <span>User</span>
+          <strong id="roleConfirmUser">—</strong>
+        </div>
+        <div class="role-context-item">
+          <span>Managed device</span>
+          <strong id="roleConfirmDevice">—</strong>
+        </div>
+        <div class="role-context-item">
+          <span>Device trust</span>
+          <strong id="roleConfirmTrust">—</strong>
+        </div>
+        <div class="role-context-item">
+          <span>Heartbeat</span>
+          <strong id="roleConfirmHeartbeat">—</strong>
+        </div>
+      </div>
+
+      <div class="role-confirm-guidance">
+        <span class="signal" aria-hidden="true"></span>
+        <span id="roleConfirmGuidance">
+          ANALYST should be granted only when job function / need-to-know justifies HIGH-data eligibility.
+        </span>
+      </div>
+
+      <div class="role-confirm-actions">
+        <button class="btn" type="button" onclick="closeRoleConfirmModal()">CANCEL</button>
+        <button
+          id="roleConfirmSubmit"
+          class="btn primary"
+          type="button"
+          onclick="confirmBusinessRoleChange()"
+        >CONFIRM GRANT</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="decisionInspectorBackdrop" class="inspector-backdrop" aria-hidden="true">
+  <section class="inspector-modal" role="dialog" aria-modal="true" aria-labelledby="decisionInspectorTitle">
+    <div class="inspector-head">
+      <div>
+        <div class="eyebrow">V1.4E · Persisted Correlation Evidence</div>
+        <h2 id="decisionInspectorTitle" class="inspector-title">Decision Inspector</h2>
+        <div class="inspector-request">
+          <span id="inspectorRequestId">No request selected</span>
+          · <button class="copy-id-btn" onclick="copyInspectorRequestId()">COPY ID</button>
+        </div>
+      </div>
+      <button class="inspector-close" type="button" aria-label="Close Decision Inspector" onclick="closeDecisionInspector()">×</button>
+    </div>
+    <div id="decisionInspectorBody" class="inspector-body">
+      <div class="inspector-loading">Select an ACCESS GRANTED / ACCESS DENIED event to inspect its persisted decision evidence.</div>
+    </div>
+  </section>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+  // ============================================================
+  // ZERO TRUST SECURITY CENTER — DASHBOARD v1.2
+  //
+  // Main idea:
+  // - Device posture is LIVE state.
+  // - OPA result is the LAST evaluated decision.
+  // - If live security state changes after a decision, the UI does
+  //   NOT invent a new ALLOW/DENY result. It marks the old result
+  //   STALE and asks for re-evaluation.
+  // ============================================================
+  let token = "";
+  let tokenExpiresAt = null;
+  let currentUser = null;
+  let currentDevice = null;
+  let deviceRefreshTimer = null;
+  let secondaryRefreshTimer = null;
+  let ttlTimer = null;
+
+  // Fast path = SSE. Existing polling remains the reconciliation fallback.
+  let realtimeSource = null;
+  let realtimeRefreshTimer = null;
+  let realtimeDeviceId = null;
+  const REALTIME_RECONCILE_MS = 250;
+  let lastDecisionSnapshot = null;
+  let decisionIsStale = false;
+  let decisionStaleSince = null;
+  let latestPostureHistory = [];
+  let latestAccessLogs = [];
+  let latestSecurityEvents = [];
+  let currentDemoControl = null;
+  let managedUsersCache = [];
+  let pendingRoleChange = null;
+  // Security Event Timeline render state.
+  // Avoid rebuilding the timeline DOM every 3 seconds when nothing changed.
+  let lastSecurityEventSignature = "";
+  let renderedSecurityEventKeys = new Set();
+  const DEVICE_REFRESH_MS = 3000;
+  const SECONDARY_REFRESH_MS = 10000;
+  const qs = id => document.getElementById(id);
+  const safeText = (v, fallback = "—") =>
+    v === null || v === undefined || v === "" ? fallback : String(v);
+  const escapeHtml = (v, fallback = "—") => {
+    const raw = v === null || v === undefined || v === "" ? fallback : String(v);
+    return raw
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  };
+  const boolText = v =>
+    v === true ? "Enabled" :
+    v === false ? "Disabled" :
+    "Unknown";
+  function formatDate(v){
+    if(!v) return "—";
+    const d = new Date(v);
+    return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleString();
+  }
+  function secondsAgo(v){
+    if(v === null || v === undefined) return "—";
+    const n = Number(v);
+    if(!Number.isFinite(n)) return "—";
+    return n < 60 ? `${n.toFixed(1)}s ago` : `${(n / 60).toFixed(1)}m ago`;
+  }
+  function toast(message){
+    const el = qs("toast");
+    el.textContent = message;
+    el.classList.add("show");
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+  function authHeaders(extra = {}){
+    return token
+      ? { ...extra, Authorization: `Bearer ${token}` }
+      : { ...extra };
+  }
+  async function apiJson(url, options = {}){
+    try{
+      const response = await fetch(url, options);
+      let data;
+      try{
+        data = await response.json();
+      }catch{
+        data = { detail: "Non-JSON response" };
+      }
+      return { response, data };
+    }catch(error){
+      return {
+        response: { ok:false, status:0 },
+        data: { detail:`Network error: ${error.message}` }
+      };
+    }
+  }
+  function setBadge(el, text, kind = "neutral"){
+    el.className = `badge ${kind}`;
+    el.textContent = text;
+  }
+  function tokenIsValid(){
+    return Boolean(
+      token &&
+      tokenExpiresAt &&
+      Date.now() < tokenExpiresAt
+    );
+  }
+  // ------------------------------------------------------------
+  // SECURITY CENTER REALTIME BRIDGE
+  //
+  // SSE wakes the UI quickly. After a small debounce, the dashboard
+  // re-reads authoritative REST state instead of trusting event payloads
+  // as the source of truth. 3s/10s polling stays enabled as fallback.
+  // ------------------------------------------------------------
+  function stopRealtimeBridge(){
+    clearTimeout(realtimeRefreshTimer);
+    realtimeRefreshTimer = null;
+
+    if(realtimeSource){
+      realtimeSource.close();
+      realtimeSource = null;
+    }
+
+    realtimeDeviceId = null;
+  }
+
+  function scheduleRealtimeReconcile(eventType){
+    clearTimeout(realtimeRefreshTimer);
+
+    realtimeRefreshTimer = setTimeout(async () => {
+      if(!tokenIsValid()) return;
+
+      if(
+        eventType === "ACCESS_DECISION"
+        || eventType === "DATA_API_FETCHED"
+      ){
+        await Promise.all([
+          loadDevices(true),
+          loadLogs(true),
+          loadSecurityEvents(true)
+        ]);
+      }else if(eventType === "DEVICE_POSTURE_REPORTED"){
+        await Promise.all([
+          loadDevices(true),
+          loadPostureHistory(true)
+        ]);
+      }else{
+        await Promise.all([
+          loadDevices(true),
+          loadSecurityEvents(true),
+          loadDemoControl(true)
+        ]);
+      }
+
+      updateChecks();
+      updateSystemState();
+    }, REALTIME_RECONCILE_MS);
+  }
+
+  function startRealtimeBridge(){
+    if(
+      !tokenIsValid()
+      || currentUser?.role !== "security-admin"
+    ){
+      stopRealtimeBridge();
+      return;
+    }
+
+    const monitoredDevice = qs("deviceId").value.trim();
+    if(!monitoredDevice){
+      stopRealtimeBridge();
+      return;
+    }
+
+    if(
+      realtimeSource
+      && realtimeDeviceId === monitoredDevice
+      && realtimeSource.readyState !== EventSource.CLOSED
+    ){
+      return;
+    }
+
+    stopRealtimeBridge();
+    realtimeDeviceId = monitoredDevice;
+
+    const params = new URLSearchParams({
+      access_token: token,
+      device_id: monitoredDevice,
+      after_id: "0",
+      tail: "true"
+    });
+
+    const source = new EventSource(
+      `/api/stream/events?${params.toString()}`
+    );
+
+    realtimeSource = source;
+
+    source.addEventListener("realtime", event => {
+      try{
+        const data = JSON.parse(event.data);
+
+        if(
+          data.device_id
+          && data.device_id !== realtimeDeviceId
+        ){
+          return;
+        }
+
+        const type = data.event_type || "";
+
+        if(
+          type === "ACCESS_DECISION"
+          || type === "DATA_API_FETCHED"
+          || type === "DEVICE_POSTURE_REPORTED"
+          || type === "SECURITY_EVENT"
+        ){
+          scheduleRealtimeReconcile(type);
+        }
+      }catch(error){
+        console.error(
+          "Security Center realtime parse failed",
+          error
+        );
+      }
+    });
+
+    source.addEventListener("auth_expired", () => {
+      stopRealtimeBridge();
+    });
+
+    // Browser EventSource reconnects automatically. Polling is still active,
+    // so transient SSE errors intentionally do not create noisy UI toasts.
+    source.onerror = () => {};
+  }
+
+
+  function clearLiveTimers(){
+    clearInterval(deviceRefreshTimer);
+    clearInterval(secondaryRefreshTimer);
+    clearInterval(ttlTimer);
+    stopRealtimeBridge();
+    deviceRefreshTimer = null;
+    secondaryRefreshTimer = null;
+    ttlTimer = null;
+  }
+  function startLiveTimers(){
+    clearLiveTimers();
+    deviceRefreshTimer = setInterval(async () => {
+      if(tokenIsValid()){
+        await loadDevices(true);
+      }
+    }, DEVICE_REFRESH_MS);
+    secondaryRefreshTimer = setInterval(async () => {
+      if(tokenIsValid()){
+        await Promise.all([
+            loadPostureHistory(true),
+            loadLogs(true),
+            loadSecurityEvents(true),
+            loadDemoControl(true)
+        ]);
+      }
+    }, SECONDARY_REFRESH_MS);
+    ttlTimer = setInterval(() => {
+      updateSessionUI();
+      updateSystemState();
+    }, 1000);
+  }
+  function updateSessionUI(){
+    if(!token || !currentUser){
+      setBadge(qs("jwtBadge"), "No token", "neutral");
+      qs("sessionUser").textContent = "—";
+      qs("sessionRole").textContent = "—";
+      qs("sessionDevice").textContent = "—";
+      qs("sessionTarget").textContent = "—";
+      qs("sessionTtl").textContent = "—";
+      return;
+    }
+    const ttlMs = tokenExpiresAt ? tokenExpiresAt - Date.now() : 0;
+    const ttlSec = Math.max(0, Math.floor(ttlMs / 1000));
+    if(ttlSec <= 0){
+      setBadge(qs("jwtBadge"), "Expired", "bad");
+      qs("sessionTtl").textContent = "Expired";
+    }else{
+      setBadge(qs("jwtBadge"), "JWT valid", "good");
+      qs("sessionTtl").textContent =
+        `${Math.floor(ttlSec / 60)}m ${String(ttlSec % 60).padStart(2,"0")}s`;
+    }
+    qs("sessionUser").textContent = currentUser.username || "—";
+    qs("sessionRole").textContent = currentUser.role || "—";
+    qs("sessionDevice").textContent = qs("authDeviceId").value || "—";
+    qs("sessionTarget").textContent = qs("deviceId").value || "—";
+  }
+  function updateSystemState(){
+    const pill = qs("systemPill");
+    const pulse = qs("systemPulse");
+    const state = qs("systemState");
+    pill.className = "system-pill";
+    pulse.className = "pulse";
+    if(!token){
+      state.textContent = "Awaiting authentication";
+      return;
+    }
+    if(!tokenIsValid()){
+      pill.classList.add("bad");
+      pulse.classList.add("bad");
+      state.textContent = "Session expired · re-authentication required";
+      return;
+    }
+    if(!currentDevice){
+      pill.classList.add("warn");
+      pulse.classList.add("warn");
+      state.textContent = "Session active · posture not loaded";
+      return;
+    }
+    if(currentDevice.heartbeat_fresh !== true){
+      pill.classList.add("bad");
+      pulse.classList.add("bad");
+      state.textContent = "Session active · device heartbeat stale";
+      return;
+    }
+    if(decisionIsStale){
+      pill.classList.add("warn");
+      pulse.classList.add("warn");
+      state.textContent = "Live posture changed · re-evaluation required";
+      return;
+    }
+    pulse.classList.add("online");
+    state.textContent = "Zero Trust pipeline online";
+  }
+  // ------------------------------------------------------------
+  // Only policy-relevant / evidence-relevant fields are included.
+  // heartbeat_age_seconds is intentionally excluded because it
+  // naturally increases every second and would create false changes.
+  // ------------------------------------------------------------
+  function securityFingerprint(d){
+    if(!d) return null;
+    return JSON.stringify({
+      device_id: d.device_id ?? null,
+      registered: d.registered ?? null,
+      trust_status: d.trust_status ?? null,
+      firewall_enabled: d.firewall_enabled ?? null,
+      patch_status: d.patch_status ?? null,
+      latest_hotfix_id: d.latest_hotfix_id ?? null,
+      pending_reboot: d.pending_reboot ?? null,
+      patch_reason: d.patch_reason ?? null,
+      heartbeat_fresh: d.heartbeat_fresh ?? null
+    });
+  }
+  function markDecisionStale(reason = "Current device/security state changed after the latest observed access decision. The next Data Vault request will be evaluated against the new state."){
+    if(!lastDecisionSnapshot) return;
+    decisionIsStale = true;
+    if(!decisionStaleSince) decisionStaleSince = Date.now();
+    qs("decisionFreshness").classList.add("show");
+    qs("decisionFreshnessText").textContent = reason;
+    qs("decisionMetric").classList.add("changed");
+
+    // Keep the historical audit visible. A previous ALLOW/DENY remains
+    // valid evidence of what happened then; it is simply not a prediction
+    // of what the next request will receive.
+    if(qs("metricDecision").textContent === "ALLOW"){
+      qs("metricReason").textContent = "Historical ALLOW · current state changed";
+    }else{
+      qs("metricReason").textContent = "Historical decision · current state changed";
+    }
+
+    renderDemoControl(
+      currentDemoControl
+    );
+    renderSecurityEvents();
+    updateSystemState();
+  }
+  function clearDecisionStale(){
+    decisionIsStale = false;
+    decisionStaleSince = null;
+    qs("decisionFreshness").classList.remove("show");
+    qs("decisionMetric").classList.remove("changed");
+    renderSecurityEvents();
+  }
+  function compareDecisionWithLiveState(){
+    if(!lastDecisionSnapshot || !currentDevice) return;
+    const liveFingerprint = securityFingerprint(currentDevice);
+    if(liveFingerprint !== lastDecisionSnapshot.deviceFingerprint){
+      markDecisionStale();
+    }
+  }
+  function renderDevice(d){
+    const previousFingerprint = securityFingerprint(currentDevice);
+    currentDevice = d || null;
+    if(!d){
+      qs("metricTrust").textContent = "Unknown";
+      qs("metricHeartbeat").textContent = "Unknown";
+      qs("metricPatch").textContent = "Unknown";
+      qs("metricTrustSub").textContent = "No posture loaded.";
+      qs("metricHeartbeatSub").textContent = "Waiting for Device Agent telemetry.";
+      qs("metricPatchSub").textContent = "No hotfix evidence loaded.";
+      qs("deviceName").textContent = "No device loaded";
+      qs("deviceMeta").textContent = "Run the agent and authenticate.";
+      setBadge(qs("trustBadge"), "Unknown", "neutral");
+      qs("factFirewall").textContent = "—";
+      qs("factHotfix").textContent = "—";
+      qs("factPatchAge").textContent = "—";
+      qs("factReboot").textContent = "—";
+      qs("factAgent").textContent = "—";
+      qs("factLastSeen").textContent = "—";
+      renderDemoControl(
+        currentDemoControl
+      );
+      renderSecurityEvents();
+      updateSystemState();
+      return;
+    }
+    const trusted = d.trust_status === "trusted";
+    const hbFresh = d.heartbeat_fresh === true;
+    const patchAgePresent =
+      d.patch_age_days !== null &&
+      d.patch_age_days !== undefined;
+    qs("metricTrust").textContent = trusted ? "TRUSTED" : "UNTRUSTED";
+    qs("metricTrust").style.color = trusted ? "var(--green)" : "var(--red)";
+    qs("metricTrustSub").textContent =
+      `${safeText(d.device_id)} · ${d.registered ? "registered" : "not registered"}`;
+    qs("metricHeartbeat").textContent = hbFresh ? "FRESH" : "STALE";
+    qs("metricHeartbeat").style.color = hbFresh ? "var(--green)" : "var(--red)";
+    qs("metricHeartbeatSub").textContent = secondsAgo(d.heartbeat_age_seconds);
+    qs("metricPatch").textContent = patchAgePresent
+      ? `${Number(d.patch_age_days).toFixed(2)} days`
+      : "Unknown";
+    qs("metricPatch").style.color =
+      d.patch_status === "updated" ? "var(--green)" : "var(--yellow)";
+    qs("metricPatchSub").textContent =
+      safeText(d.latest_hotfix_id, "No hotfix ID");
+    qs("deviceName").textContent =
+      safeText(d.device_name, d.device_id);
+    qs("deviceMeta").textContent =
+      `${safeText(d.owner_username,"Unknown owner")} · ${safeText(d.owner_role,"Unknown role")} · ` +
+      `${safeText(d.hostname,"Unknown host")} · ` +
+      `${safeText(d.os_name,"Unknown OS")} ${safeText(d.os_release,"")}`;
+    setBadge(
+      qs("trustBadge"),
+      trusted ? "Trusted" : "Untrusted",
+      trusted ? "good" : "bad"
+    );
+    qs("factFirewall").textContent = boolText(d.firewall_enabled);
+    qs("factHotfix").textContent = safeText(d.latest_hotfix_id);
+    qs("factPatchAge").textContent = patchAgePresent
+      ? `${Number(d.patch_age_days).toFixed(2)} days`
+      : "—";
+    qs("factReboot").textContent =
+      d.pending_reboot === true ? "Pending" :
+      d.pending_reboot === false ? "None" :
+      "Unknown";
+    qs("factAgent").textContent = safeText(d.agent_version);
+    qs("factLastSeen").textContent = formatDate(d.last_seen);
+    updateChecks();
+    const newFingerprint = securityFingerprint(d);
+    // If a real security-relevant field changed, flag the old decision.
+    if(
+      lastDecisionSnapshot &&
+      previousFingerprint &&
+      previousFingerprint !== newFingerprint
+    ){
+      compareDecisionWithLiveState();
+    }else{
+      compareDecisionWithLiveState();
+    }
+    renderDemoControl(
+      currentDemoControl
+    );
+    renderSecurityEvents();
+    updateSystemState();
+  }
+  function checkRow(label, detail, state){
+    const icon =
+      state === "pass" ? "✓" :
+      state === "fail" ? "×" :
+      "?";
+    const txt =
+      state === "pass" ? "Pass" :
+      state === "fail" ? "Fail" :
+      "Unknown";
+    return `
+      <div class="check ${state}">
+        <div class="check-icon">${icon}</div>
+        <div>
+          <div class="check-name">${label}</div>
+          <div class="check-detail">${detail}</div>
+        </div>
+        <div class="check-state">${txt}</div>
+      </div>
+    `;
+  }
+  function updateChecks(){
+    const d = currentDevice;
+    const operator = currentUser;
+    const patchEvidencePresent = Boolean(
+      d &&
+      d.latest_hotfix_id != null &&
+      d.patch_age_days != null &&
+      d.pending_reboot != null
+    );
+    const operatorState =
+      !operator ? "unknown" :
+      (tokenIsValid() && operator.role === "security-admin")
+        ? "pass"
+        : "fail";
+    const subjectPresent = Boolean(
+      d &&
+      d.owner_username &&
+      d.owner_role
+    );
+    qs("checkList").innerHTML = [
+      checkRow(
+        "Monitored identity",
+        subjectPresent
+          ? `${safeText(d.owner_username)} · ${safeText(d.owner_role)}`
+          : "No monitored resource subject loaded",
+        subjectPresent ? "pass" : "unknown"
+      ),
+      checkRow(
+        "SOC operator authorization",
+        operator
+          ? `${safeText(operator.username)} · ${safeText(operator.role)}`
+          : "No Security Center session",
+        operatorState
+      ),
+      checkRow(
+        "Device registered",
+        d ? safeText(d.device_id) : "No device posture loaded",
+        !d ? "unknown" : (d.registered ? "pass" : "fail")
+      ),
+      checkRow(
+        "Device trust",
+        d ? `trust_status = ${safeText(d.trust_status)}` : "Trust unknown",
+        !d ? "unknown" : (d.trust_status === "trusted" ? "pass" : "fail")
+      ),
+      checkRow(
+        "Firewall posture",
+        d ? `firewall_enabled = ${safeText(d.firewall_enabled)}` : "Firewall evidence unavailable",
+        !d ? "unknown" : (d.firewall_enabled === true ? "pass" : "fail")
+      ),
+      checkRow(
+        "Patch evidence",
+        d
+          ? `${safeText(d.latest_hotfix_id)} · age ${safeText(d.patch_age_days)} days · reboot ${safeText(d.pending_reboot)}`
+          : "Patch evidence unavailable",
+        !d ? "unknown" : (patchEvidencePresent ? "pass" : "fail")
+      ),
+      checkRow(
+        "Heartbeat freshness",
+        d ? secondsAgo(d.heartbeat_age_seconds) : "Heartbeat unavailable",
+        !d ? "unknown" : (d.heartbeat_fresh === true ? "pass" : "fail")
+      ),
+      checkRow(
+        "Access origin",
+        "Business-data requests originate in Zero Trust Data Vault",
+        tokenIsValid() && d ? "pass" : "unknown"
+      )
+    ].join("");
+  }
+  async function login(){
+    clearLiveTimers();
+    token = "";
+    currentUser = null;
+    currentDevice = null;
+    tokenExpiresAt = null;
+    lastDecisionSnapshot = null;
+    decisionIsStale = false;
+    decisionStaleSince = null;
+    latestPostureHistory = [];
+    latestAccessLogs = [];
+    latestSecurityEvents = [];
+    currentDemoControl = null;
+    renderDemoControl(null);
+    lastSecurityEventSignature = "";
+    renderedSecurityEventKeys = new Set();
+    renderSecurityEvents();
+    renderDevice(null);
+    updateDecisionUI(null, null);
+    const body = {
+      username: qs("username").value.trim(),
+      password: qs("password").value,
+      device_id: qs("authDeviceId").value.trim()
+    };
+    const { response, data } = await apiJson("/api/auth/login", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify(body)
+    });
+    if(!response.ok){
+      toast(data?.detail || "Login failed");
+      setBadge(qs("jwtBadge"), "Auth failed", "bad");
+      updateSystemState();
+      return;
+    }
+    if(data?.user?.role !== "security-admin"){
+      toast("Security Center requires the security-admin role");
+      setBadge(qs("jwtBadge"), "Admin required", "bad");
+      updateSystemState();
+      return;
+    }
+    token = data.access_token;
+    currentUser = data.user || null;
+    tokenExpiresAt =
+      Date.now() + ((data.expires_in_minutes || 30) * 60 * 1000);
+    updateSessionUI();
+    updateChecks();
+    updateSystemState();
+    toast(`Authenticated as ${currentUser?.username || body.username}`);
+    await refreshAll();
+    startLiveTimers();
+  }
+  async function setTrust(status){
+    const id = qs("deviceId").value.trim();
+    const { response, data } = await apiJson(
+      `/api/admin/devices/${encodeURIComponent(id)}/trust`,
+      {
+        method:"PUT",
+        headers:authHeaders({
+          "Content-Type":"application/json",
+          "X-Admin-Key":"demo-admin-key"
+        }),
+        body:JSON.stringify({ trust_status:status })
+      }
+    );
+    if(!response.ok){
+      toast(data?.detail || "Failed to update trust");
+      return;
+    }
+    toast(`Device marked ${status.toUpperCase()}`);
+    await loadDevices();
+  }
+function renderDemoControl(control){
+  currentDemoControl = control || null;
+  const badge = qs("demoControlBadge");
+  if(!badge){
+    return;
+  }
+  if(!control){
+    setBadge(
+      badge,
+      "Not loaded",
+      "neutral"
+    );
+    setBadge(
+      qs("demoFirewallState"),
+      "Unknown",
+      "neutral"
+    );
+    setBadge(
+      qs("demoPatchState"),
+      "Unknown",
+      "neutral"
+    );
+    setBadge(
+      qs("demoHeartbeatState"),
+      "Unknown",
+      "neutral"
+    );
+    const trust = (
+      currentDevice?.trust_status
+    );
+    setBadge(
+      qs("demoTrustState"),
+      trust || "Unknown",
+      trust === "trusted"
+        ? "good"
+        : trust === "untrusted"
+          ? "bad"
+          : "neutral"
+    );
+    qs(
+      "demoControlUpdated"
+    ).textContent =
+      "Desired state not loaded.";
+    return;
+  }
+  const firewallOff = (
+    control
+      .simulate_firewall_disabled
+    === true
+  );
+  const patchOld = (
+    control
+      .simulate_patch_outdated
+    === true
+  );
+  const agentLoss = (
+    control
+      .simulate_agent_loss
+    === true
+  );
+  const trust = (
+    currentDevice?.trust_status
+  );
+  const anySimulation = (
+    firewallOff
+    || patchOld
+    || agentLoss
+  );
+  const trustRevoked = (
+    trust === "untrusted"
+  );
+  const demoBaseline = (
+    trust === "trusted"
+    && !anySimulation
+  );
+  setBadge(
+    badge,
+    demoBaseline
+      ? "Demo baseline"
+      : trustRevoked
+        ? "Trust revoked"
+        : anySimulation
+          ? "Simulation active"
+          : "Not ready",
+    demoBaseline
+      ? "good"
+      : trustRevoked
+        ? "bad"
+        : anySimulation
+          ? "warn"
+          : "neutral"
+  );
+  setBadge(
+    qs("demoTrustState"),
+    trust || "Unknown",
+    trust === "trusted"
+      ? "good"
+      : trust === "untrusted"
+        ? "bad"
+        : "neutral"
+  );
+  setBadge(
+    qs("demoFirewallState"),
+    firewallOff
+      ? "Simulated OFF"
+      : "Real telemetry",
+    firewallOff
+      ? "bad"
+      : "neutral"
+  );
+  setBadge(
+    qs("demoPatchState"),
+    patchOld
+      ? "Simulated OLD"
+      : "Real telemetry",
+    patchOld
+      ? "bad"
+      : "neutral"
+  );
+  setBadge(
+    qs("demoHeartbeatState"),
+    agentLoss
+      ? "Agent loss"
+      : "Reporting",
+    agentLoss
+      ? "bad"
+      : "neutral"
+  );
+  qs(
+    "demoControlUpdated"
+  ).textContent =
+    control.updated_at
+      ? (
+          "Desired state updated: "
+          + formatDate(
+              control.updated_at
+            )
+        )
+      : "Using default demo baseline.";
+}
+async function loadDemoControl(
+  silent = false
+){
+  const id = (
+    qs("deviceId")
+      .value
+      .trim()
+  );
+  if(!id){
+    return;
+  }
+  const {
+    response,
+    data
+  } = await apiJson(
+    `/api/admin/demo/devices/${
+      encodeURIComponent(id)
+    }/control`,
+    {
+      headers:authHeaders({
+        "X-Admin-Key":
+          "demo-admin-key"
+      })
+    }
+  );
+  if(!response.ok){
+    if(!silent){
+      toast(
+        data?.detail
+        || "Failed to load demo control"
+      );
+    }
+    return;
+  }
+  renderDemoControl(
+    data
+  );
+}
+async function updateDemoControl(
+  patch,
+  successMessage
+){
+  const id = (
+    qs("deviceId")
+      .value
+      .trim()
+  );
+  const {
+    response,
+    data
+  } = await apiJson(
+    `/api/admin/demo/devices/${
+      encodeURIComponent(id)
+    }/control`,
+    {
+      method:"PUT",
+      headers:authHeaders({
+        "Content-Type":
+          "application/json",
+        "X-Admin-Key":
+          "demo-admin-key"
+      }),
+      body:JSON.stringify(
+        patch
+      )
+    }
+  );
+  if(!response.ok){
+    toast(
+      data?.detail
+      || "Failed to update demo control"
+    );
+    return;
+  }
+  renderDemoControl(
+    data
+  );
+  toast(
+    successMessage
+    + " · waiting for agent telemetry"
+  );
+}
+  async function resetDemoBaseline(){
+    const id = (
+      qs("deviceId")
+        .value
+        .trim()
+    );
+    const [
+      trustResult,
+      controlResult
+    ] = await Promise.all([
+      apiJson(
+        `/api/admin/devices/${
+          encodeURIComponent(id)
+        }/trust`,
+        {
+          method:"PUT",
+          headers:authHeaders({
+            "Content-Type":
+              "application/json",
+            "X-Admin-Key":
+              "demo-admin-key"
+          }),
+          body:JSON.stringify({
+            trust_status:"trusted"
+          })
+        }
+      ),
+      apiJson(
+        `/api/admin/demo/devices/${
+          encodeURIComponent(id)
+        }/control`,
+        {
+          method:"PUT",
+          headers:authHeaders({
+            "Content-Type":
+              "application/json",
+            "X-Admin-Key":
+              "demo-admin-key"
+          }),
+          body:JSON.stringify({
+            simulate_firewall_disabled:
+              false,
+            simulate_patch_outdated:
+              false,
+            simulate_agent_loss:
+              false
+          })
+        }
+      )
+    ]);
+    if(
+      !trustResult.response.ok
+      || !controlResult.response.ok
+    ){
+      toast(
+        "Demo baseline reset failed"
+      );
+      return;
+    }
+    renderDemoControl(
+      controlResult.data
+    );
+    toast(
+      "Demo baseline requested · waiting for agent telemetry"
+    );
+  }
+  function handleUnauthorized(data, silent = false){
+    setBadge(qs("jwtBadge"), "Expired", "bad");
+    updateSessionUI();
+    updateChecks();
+    updateSystemState();
+    if(!silent){
+      toast(data?.detail || "Session expired");
+    }
+  }
+  async function loadDevices(silent = false){
+    if(!token){
+      if(!silent) toast("Login first");
+      return;
+    }
+    const { response, data } = await apiJson("/api/devices", {
+      headers:authHeaders()
+    });
+    if(response.status === 401){
+      handleUnauthorized(data, silent);
+      return;
+    }
+    if(!response.ok){
+      if(!silent) toast(data?.detail || "Failed to load device");
+      return;
+    }
+    const id = qs("deviceId").value.trim();
+    const d = Array.isArray(data)
+      ? (data.find(x => x.device_id === id) || data[0] || null)
+      : null;
+    renderDevice(d);
+  }
+  async function requestData(){
+    if(!token){
+      toast("Login first");
+      return;
+    }
+    const id = qs("deviceId").value.trim();
+    // Load the freshest device view immediately before evaluation.
+    await loadDevices(true);
+    const { response, data } = await apiJson("/api/protected/data", {
+      headers:authHeaders({ "X-Device-Id":id })
+    });
+    updateDecisionUI(response, data);
+    if(response.status === 401){
+      handleUnauthorized(data, true);
+    }
+    // Snapshot the exact live state that existed for this evaluation.
+    if(response.status !== 0){
+      lastDecisionSnapshot = {
+        evaluatedAt: Date.now(),
+        deviceFingerprint: securityFingerprint(currentDevice),
+        httpStatus: response.status,
+        decision:
+          response.ok && data?.decision === "ALLOW" ? "ALLOW" : "DENY"
+      };
+      clearDecisionStale();
+    }
+    await Promise.all([
+        loadDevices(true),
+        loadLogs(true),
+        loadSecurityEvents(true),
+        loadDemoControl(true)
+    ]);
+    compareDecisionWithLiveState();
+    updateSystemState();
+  }
+  function updateDecisionUI(response, data){
+    if(!response || !data){
+      qs("metricDecision").textContent = "Not evaluated";
+      qs("metricDecision").style.color = "";
+      qs("metricReason").textContent =
+        "Authenticate as SOC admin, then observe Data Vault access.";
+      qs("decisionWord").textContent = "IDLE";
+      qs("decisionWord").className = "decision-word idle";
+      setBadge(qs("decisionHttp"), "No request", "neutral");
+      qs("decisionReason").textContent = "Not evaluated";
+      qs("protectedRecords").innerHTML =
+        '<div class="empty">Business access originates in Data Vault. Use Decision Inspector for persisted evidence.</div>';
+      qs("rawDecision").textContent = "No Data Vault decision observed yet.";
+      clearDecisionStale();
+      return;
+    }
+    const allowed =
+      response.ok &&
+      data.decision === "ALLOW";
+    const reason =
+      data.reason ||
+      data?.detail?.reason ||
+      (typeof data.detail === "string" ? data.detail : "UNKNOWN");
+    qs("metricDecision").textContent = allowed ? "ALLOW" : "DENY";
+    qs("metricDecision").style.color =
+      allowed ? "var(--green)" : "var(--red)";
+    qs("metricReason").textContent = reason;
+    qs("decisionWord").textContent = allowed ? "ALLOW" : "DENY";
+    qs("decisionWord").className =
+      `decision-word ${allowed ? "allow" : "deny"}`;
+    setBadge(
+      qs("decisionHttp"),
+      `HTTP ${response.status}`,
+      response.status >= 200 && response.status < 300
+        ? "good"
+        : response.status === 401
+          ? "warn"
+          : "bad"
+    );
+    qs("decisionReason").textContent = reason;
+    qs("rawDecision").textContent =
+      JSON.stringify(data, null, 2);
+    const records = data?.data?.records;
+    if(allowed && Array.isArray(records)){
+      qs("protectedRecords").innerHTML = records.map(r => `
+        <div class="record">
+          <div>
+            <strong>${safeText(r.customer)}</strong>
+            <div style="color:var(--muted);margin-top:2px">
+              Record #${safeText(r.id)}
+            </div>
+          </div>
+          <span class="badge ${
+            r.risk === "low"
+              ? "good"
+              : r.risk === "high"
+                ? "bad"
+                : "warn"
+          }">${safeText(r.risk)}</span>
+        </div>
+      `).join("");
+    }else{
+      qs("protectedRecords").innerHTML = `
+        <div class="empty">
+          Protected payload withheld. Reason:
+          <strong>${safeText(reason)}</strong>.
+        </div>
+      `;
+    }
+  }
+  
+
+// V1.5 IDENTITY WORKSPACE NAVIGATION
+function openIdentityWorkspace(){
+  if(!token || !tokenIsValid()){
+    toast("Authenticate as SOC admin before opening Identity & Access");
+    return;
+  }
+
+  const backdrop = qs("identityWorkspaceBackdrop");
+  if(!backdrop) return;
+
+  backdrop.classList.add("open");
+  backdrop.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+  loadManagedUsers(true);
+}
+
+function closeIdentityWorkspace(){
+  closeRoleConfirmModal();
+
+  const backdrop = qs("identityWorkspaceBackdrop");
+  if(!backdrop) return;
+
+  backdrop.classList.remove("open");
+  backdrop.setAttribute("aria-hidden","true");
+  document.body.style.overflow = "";
+}
+
+document.addEventListener("keydown", event => {
+  if(event.key === "Escape"){
+    const roleBackdrop = qs("roleConfirmBackdrop");
+    if(roleBackdrop?.classList.contains("open")){
+      closeRoleConfirmModal();
+      return;
+    }
+
+    const backdrop = qs("identityWorkspaceBackdrop");
+    if(backdrop?.classList.contains("open")){
+      closeIdentityWorkspace();
+    }
+  }
+});
+
+// V1.5 IDENTITY GOVERNANCE FUNCTIONS
+async function loadManagedUsers(silent = false){
+  if(!token){
+    if(!silent) toast("Login first");
+    return;
+  }
+
+  const { response, data } = await apiJson(
+    "/api/admin/users",
+    { headers: authHeaders() }
+  );
+
+  if(response.status === 401){
+    handleUnauthorized(data, silent);
+    return;
+  }
+
+  if(!response.ok){
+    if(!silent) toast(data?.detail || "Failed to load managed users");
+    return;
+  }
+
+  renderManagedUsers(data?.users || []);
+}
+
+function renderManagedUsers(users){
+  managedUsersCache = Array.isArray(users) ? users : [];
+
+  const root = qs("managedUsers");
+  if(!root) return;
+
+  if(!Array.isArray(users) || !users.length){
+    root.innerHTML =
+      '<div class="identity-empty">No managed business identities found.</div>';
+    return;
+  }
+
+  root.innerHTML = users.map(user => {
+    const device = Array.isArray(user.devices) && user.devices.length
+      ? user.devices[0]
+      : null;
+
+    const role = safeText(user.role, "viewer");
+    const analyst = role === "analyst";
+    const trust = safeText(device?.trust_status, "unknown");
+    const heartbeatFresh = device?.heartbeat_fresh === true;
+    const deviceId = safeText(device?.device_id, "No device");
+
+    return `
+      <div class="identity-user">
+        <div>
+          <div class="identity-user-name">${escapeHtml(user.username)}</div>
+          <div class="identity-user-meta">
+            ${escapeHtml(deviceId)} · ${escapeHtml(device?.device_name || "Managed device")}
+          </div>
+        </div>
+
+        <div class="identity-user-signals">
+          <span class="badge ${analyst ? "warn" : "neutral"}">
+            ${escapeHtml(role.toUpperCase())}
+          </span>
+          <span class="badge ${trust === "trusted" ? "good" : "bad"}">
+            ${escapeHtml(trust.toUpperCase())}
+          </span>
+          <span class="badge ${heartbeatFresh ? "good" : "neutral"}">
+            ${heartbeatFresh ? "HEARTBEAT FRESH" : "NO FRESH HEARTBEAT"}
+          </span>
+        </div>
+
+        <div class="identity-user-actions">
+          <button
+            class="btn ${analyst ? "" : "good"}"
+            type="button"
+            onclick="setBusinessRole('${escapeHtml(user.username)}','${analyst ? "viewer" : "analyst"}')"
+          >
+            ${analyst ? "RETURN TO VIEWER" : "GRANT ANALYST"}
+          </button>
+          ${device?.device_id ? `
+            <button
+              class="btn"
+              type="button"
+              onclick="copyAgentCommand('${escapeHtml(device.device_id)}')"
+            >
+              COPY AGENT CMD
+            </button>
+          ` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function provisionUser(){
+  if(!token){
+    toast("Authenticate as SOC admin first");
+    return;
+  }
+
+  const body = {
+    username: qs("provUsername").value.trim(),
+    password: qs("provPassword").value,
+    device_id: qs("provDeviceId").value.trim(),
+    device_name: qs("provDeviceName").value.trim() || null
+  };
+
+  if(!body.username || !body.password || !body.device_id){
+    toast("Username, password and Device ID are required");
+    return;
+  }
+
+  const { response, data } = await apiJson(
+    "/api/admin/users",
+    {
+      method:"POST",
+      headers:authHeaders({
+        "Content-Type":"application/json",
+        "X-Admin-Key":"demo-admin-key"
+      }),
+      body:JSON.stringify(body)
+    }
+  );
+
+  if(!response.ok){
+    toast(data?.detail || "Provisioning failed");
+    return;
+  }
+
+  qs("provPassword").value = "";
+  toast(
+    `Provisioned ${data.user.username} as VIEWER · device ${data.device.device_id} starts UNTRUSTED`
+  );
+
+  await Promise.all([
+    loadManagedUsers(true),
+    loadDevices(true),
+    loadSecurityEvents(true)
+  ]);
+}
+
+function getManagedUserContext(username){
+  const user = managedUsersCache.find(
+    item => String(item?.username || "").toLowerCase() === String(username || "").toLowerCase()
+  );
+  const device = Array.isArray(user?.devices) && user.devices.length
+    ? user.devices[0]
+    : null;
+
+  return {
+    currentRole:safeText(user?.role,"viewer"),
+    deviceId:safeText(device?.device_id,"No managed device"),
+    trust:safeText(device?.trust_status,"unknown"),
+    heartbeatFresh:device?.heartbeat_fresh === true
+  };
+}
+
+function openRoleConfirmModal(username, role){
+  const nextRole = role === "analyst" ? "analyst" : "viewer";
+  const context = getManagedUserContext(username);
+
+  pendingRoleChange = { username, role:nextRole };
+
+  qs("roleConfirmUser").textContent = username;
+  qs("roleConfirmDevice").textContent = context.deviceId;
+  qs("roleConfirmTrust").textContent = context.trust.toUpperCase();
+  qs("roleConfirmHeartbeat").textContent = context.heartbeatFresh
+    ? "FRESH"
+    : "NO FRESH HEARTBEAT";
+  qs("roleConfirmCurrentRole").textContent = context.currentRole.toUpperCase();
+  qs("roleConfirmTargetRole").textContent = nextRole.toUpperCase();
+
+  const isGrant = nextRole === "analyst";
+
+  qs("roleConfirmTitle").textContent = isGrant
+    ? `Grant ANALYST to ${username}?`
+    : `Return ${username} to VIEWER?`;
+
+  qs("roleConfirmMessage").textContent = isGrant
+    ? "This elevates the business role for future policy evaluations. Device trust and posture remain separate controls."
+    : "This restores the default least-privilege business role for future policy evaluations.";
+
+  qs("roleConfirmGuidance").textContent = isGrant
+    ? "Grant ANALYST only when job function / need-to-know justifies HIGH-data eligibility. SECURITY-ADMIN cannot be assigned from this workflow."
+    : "Returning to VIEWER removes ANALYST eligibility and restores least privilege. Device trust is not changed.";
+
+  const submit = qs("roleConfirmSubmit");
+  submit.textContent = isGrant ? "CONFIRM GRANT" : "RETURN TO VIEWER";
+  submit.className = isGrant ? "btn primary" : "btn";
+  submit.disabled = false;
+
+  const backdrop = qs("roleConfirmBackdrop");
+  backdrop.classList.add("open");
+  backdrop.setAttribute("aria-hidden","false");
+  document.body.classList.add("role-modal-open");
+}
+
+function closeRoleConfirmModal(){
+  const backdrop = qs("roleConfirmBackdrop");
+  if(!backdrop) return;
+
+  backdrop.classList.remove("open");
+  backdrop.setAttribute("aria-hidden","true");
+  document.body.classList.remove("role-modal-open");
+  pendingRoleChange = null;
+}
+
+function setBusinessRole(username, role){
+  openRoleConfirmModal(username, role);
+}
+
+async function confirmBusinessRoleChange(){
+  if(!pendingRoleChange) return;
+
+  const { username, role } = pendingRoleChange;
+  const submit = qs("roleConfirmSubmit");
+  submit.disabled = true;
+  submit.textContent = role === "analyst" ? "APPLYING…" : "RESTORING…";
+
+  const { response, data } = await apiJson(
+    `/api/admin/users/${encodeURIComponent(username)}/role`,
+    {
+      method:"PUT",
+      headers:authHeaders({
+        "Content-Type":"application/json",
+        "X-Admin-Key":"demo-admin-key"
+      }),
+      body:JSON.stringify({ role })
+    }
+  );
+
+  if(!response.ok){
+    submit.disabled = false;
+    submit.textContent = role === "analyst" ? "CONFIRM GRANT" : "RETURN TO VIEWER";
+    toast(data?.detail || "Role update failed");
+    return;
+  }
+
+  closeRoleConfirmModal();
+  toast(
+    `${username}: ${String(data.old_role).toUpperCase()} → ${String(data.new_role).toUpperCase()}`
+  );
+
+  await Promise.all([
+    loadManagedUsers(true),
+    loadDevices(true),
+    loadSecurityEvents(true)
+  ]);
+}
+
+async function copyAgentCommand(deviceId){
+  const command =
+    `python device_agent\\agent.py --device-id ${deviceId}`;
+
+  try{
+    await navigator.clipboard.writeText(command);
+    toast(`Agent command copied for ${deviceId}`);
+  }catch{
+    window.prompt("Copy Device Agent command:", command);
+  }
+}
+
+// ------------------------------------------------------------
+// SECURITY EVENT TIMELINE v1.3
+// Correlates persisted security events + access logs +
+// posture evidence + live decision freshness.
+// ------------------------------------------------------------
+  function eventTs(value){
+    const n = new Date(value).getTime();
+    return Number.isFinite(n) ? n : 0;
+  }
+  function compactEventTime(ms){
+    if(!ms) return "—";
+    return new Date(ms).toLocaleTimeString([], {
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit"
+    });
+  }
+  function eventTypeLabel(type){
+      return ({
+          access:"ACCESS",
+          posture:"POSTURE",
+          security:"SECURITY",
+          live:"LIVE",
+          recovery:"RECOVERY"
+      })[type] || "EVENT";
+  }
+function persistedEventTone(row){
+    const severity = String(
+        row?.severity || ""
+    ).toLowerCase();
+    if(
+        severity === "critical" ||
+        severity === "high"
+    ){
+        return "bad";
+    }
+    if(
+        severity === "warning" ||
+        severity === "warn" ||
+        severity === "medium"
+    ){
+        return "warn";
+    }
+    return "good";
+}
+function mapPersistedSecurityEvent(row){
+    const ts = eventTs(row?.created_at);
+    if(!ts){
+        return null;
+    }
+    const eventType = String(
+        row?.event_type || "SECURITY_EVENT"
+    );
+    const oldValue = safeText(row?.old_value);
+    const newValue = safeText(row?.new_value);
+    const source = safeText(row?.source, "backend");
+    const details = row?.details || {};
+    if(eventType === "USER_PROVISIONED"){
+        return {
+            ts,
+            type:"security",
+            tone:"info",
+            title:"USER PROVISIONED",
+            detail:
+                `${safeText(row.username)} · ${safeText(row.new_value,"viewer")} · ` +
+                `${safeText(row.device_id,"no device")} · device starts UNTRUSTED · ` +
+                `actor ${safeText(details.actor,"security-admin")}`,
+            tag:"LEAST PRIVILEGE"
+        };
+    }
+    if(eventType === "USER_ROLE_CHANGED"){
+        const elevated = row.new_value === "analyst";
+        return {
+            ts,
+            type:elevated ? "security" : "recovery",
+            tone:elevated ? "warn" : "good",
+            title:elevated ? "ANALYST ROLE GRANTED" : "VIEWER ROLE RESTORED",
+            detail:
+                `${safeText(row.username)}: ${oldValue} → ${newValue} · ` +
+                `actor ${safeText(details.actor,"security-admin")}`,
+            tag:elevated ? "NEED-TO-KNOW" : "LEAST PRIVILEGE"
+        };
+    }
+    if(eventType === "DEVICE_TRUST_CHANGED"){
+        const restored = row.new_value === "trusted";
+        return {
+            ts,
+            type: restored ? "recovery" : "security",
+            tone: restored ? "good" : "bad",
+            title: restored
+                ? "DEVICE TRUST RESTORED"
+                : "DEVICE TRUST REVOKED",
+            detail:
+                `trust_status: ${oldValue} → ${newValue} · source ${source}`,
+            tag: restored
+                ? "TRUSTED"
+                : "DEVICE_UNTRUSTED"
+        };
+    }
+    if(eventType === "DEVICE_HEARTBEAT_STALE"){
+        return {
+            ts,
+            type:"security",
+            tone:"bad",
+            title:"HEARTBEAT STALE",
+            detail:
+                `${oldValue} → ${newValue} · ` +
+                `timeout ${safeText(
+                    details.stale_threshold_seconds,
+                    90
+                )}s`,
+            tag:"DEVICE_STALE"
+        };
+    }
+    if(eventType === "DEVICE_HEARTBEAT_RECOVERED"){
+        return {
+            ts,
+            type:"recovery",
+            tone:"good",
+            title:"HEARTBEAT RECOVERED",
+            detail:
+                `${oldValue} → ${newValue} · ` +
+                `gap ${safeText(
+                    details.gap_seconds,
+                    "?"
+                )}s`,
+            tag:"RECOVERED"
+        };
+    }
+    if(eventType === "DEVICE_FIREWALL_CHANGED"){
+        const disabled = row.new_value === "disabled";
+        return {
+            ts,
+            type: disabled ? "security" : "recovery",
+            tone: disabled ? "bad" : "good",
+            title: disabled
+                ? "FIREWALL DISABLED"
+                : "FIREWALL RESTORED",
+            detail:
+                `firewall: ${oldValue} → ${newValue}`,
+            tag: disabled
+                ? "FIREWALL_DISABLED"
+                : "RECOVERED"
+        };
+    }
+    if(eventType === "DEVICE_PATCH_STATUS_CHANGED"){
+        const compliant = row.new_value === "updated";
+        return {
+            ts,
+            type: compliant ? "recovery" : "security",
+            tone: compliant ? "good" : "bad",
+            title: compliant
+                ? "PATCH COMPLIANCE RESTORED"
+                : "PATCH COMPLIANCE LOST",
+            detail:
+                `${safeText(
+                    details.latest_hotfix_id,
+                    "No hotfix"
+                )} · age ${safeText(
+                    details.patch_age_days,
+                    "?"
+                )} days · ${safeText(
+                    row.reason,
+                    "UNKNOWN"
+                )}`,
+            tag: compliant
+                ? "PATCH_COMPLIANT"
+                : safeText(
+                    row.reason,
+                    "PATCH_NOT_COMPLIANT"
+                )
+        };
+    }
+    return {
+        ts,
+        type:"security",
+        tone:persistedEventTone(row),
+        title:eventType.replaceAll("_", " "),
+        detail:
+            `${oldValue} → ${newValue} · ` +
+            `reason ${safeText(row.reason)}`,
+        tag:safeText(row.reason, eventType)
+    };
+}
+function hasPersistedEvent(
+    eventType,
+    ts,
+    toleranceMs = 5000
+){
+    return (
+        Array.isArray(latestSecurityEvents)
+        ? latestSecurityEvents
+        : []
+    ).some(row =>
+        row.event_type === eventType &&
+        Math.abs(
+            eventTs(row.created_at) - ts
+        ) <= toleranceMs
+    );
+}
+  function latestPersistedHeartbeatEvent(deviceId){
+      return (
+          Array.isArray(latestSecurityEvents)
+          ? [...latestSecurityEvents]
+          : []
+      )
+          .filter(row =>
+              row.device_id === deviceId &&
+              (
+                  row.event_type ===
+                      "DEVICE_HEARTBEAT_STALE" ||
+                  row.event_type ===
+                      "DEVICE_HEARTBEAT_RECOVERED"
+              )
+          )
+          .sort(
+              (a,b) =>
+                  eventTs(b.created_at) -
+                  eventTs(a.created_at)
+          )[0] || null;
+  }
+    
+  function buildSecurityEvents(){
+      const events = [];
+      for(
+          const row of (
+              Array.isArray(latestSecurityEvents)
+              ? latestSecurityEvents
+              : []
+          )
+      ){
+          const event =
+              mapPersistedSecurityEvent(row);
+          if(event){
+              events.push(event);
+          }
+      }
+      const rows = Array.isArray(latestPostureHistory)
+          ? [...latestPostureHistory].sort(
+              (a,b) =>
+                  eventTs(a.reported_at) -
+                  eventTs(b.reported_at)
+          )
+          : [];
+    let prev = null;
+    for(const row of rows){
+      const ts = eventTs(row.reported_at);
+      if(!prev){
+        events.push({
+          ts,
+          type:"posture",
+          tone:"info",
+          title:"DEVICE POSTURE OBSERVED",
+          detail:`Firewall ${row.firewall_enabled === true ? "enabled" : "disabled"} · Patch ${safeText(row.patch_status,"unknown")} · ${safeText(row.latest_hotfix_id,"no hotfix")}`,
+          tag:"BASELINE"
+        });
+        prev = row;
+        continue;
+      }
+      const prevTs = eventTs(prev.reported_at);
+      const gapSeconds = prevTs && ts ? (ts - prevTs) / 1000 : 0;
+      if(
+          gapSeconds > 90 &&
+          !hasPersistedEvent(
+              "DEVICE_HEARTBEAT_STALE",
+              prevTs + 90000
+          )
+      ){
+        events.push({
+          ts:prevTs + 90000,
+          type:"posture",
+          tone:"bad",
+          title:"HEARTBEAT GAP DETECTED",
+          detail:`No posture telemetry for ${gapSeconds.toFixed(0)}s between reports. Device would be stale after 90s.`,
+          tag:"DEVICE_STALE"
+        });
+      }
+      if(
+          prev.firewall_enabled !== row.firewall_enabled &&
+          !hasPersistedEvent(
+              "DEVICE_FIREWALL_CHANGED",
+              ts
+          )
+      ){
+        const disabled = row.firewall_enabled !== true;
+        events.push({
+          ts,
+          type:disabled ? "posture" : "recovery",
+          tone:disabled ? "bad" : "good",
+          title:disabled ? "FIREWALL DISABLED" : "FIREWALL RESTORED",
+          detail:`firewall_enabled: ${safeText(prev.firewall_enabled)} → ${safeText(row.firewall_enabled)}`,
+          tag:disabled ? "FIREWALL_DISABLED" : "RECOVERED"
+        });
+      }
+      if(prev.pending_reboot !== row.pending_reboot){
+        const pending = row.pending_reboot === true;
+        events.push({
+          ts,
+          type:pending ? "posture" : "recovery",
+          tone:pending ? "bad" : "good",
+          title:pending ? "PENDING REBOOT DETECTED" : "REBOOT CONDITION CLEARED",
+          detail:`pending_reboot: ${safeText(prev.pending_reboot)} → ${safeText(row.pending_reboot)}`,
+          tag:pending ? "PENDING_REBOOT" : "RECOVERED"
+        });
+      }
+      const patchStatusChanged =
+          prev.patch_status !== row.patch_status;
+      const patchReasonChanged =
+          prev.patch_reason !== row.patch_reason;
+      if(
+          (
+              patchStatusChanged ||
+              patchReasonChanged
+          ) &&
+          !(
+              patchStatusChanged &&
+              hasPersistedEvent(
+                  "DEVICE_PATCH_STATUS_CHANGED",
+                  ts
+              )
+          )
+      ){
+        const compliant = row.patch_status === "updated";
+        events.push({
+          ts,
+          type:compliant ? "recovery" : "posture",
+          tone:compliant ? "good" : "bad",
+          title:compliant ? "PATCH COMPLIANCE RESTORED" : "PATCH COMPLIANCE LOST",
+          detail:`${safeText(row.latest_hotfix_id,"No hotfix")} · age ${safeText(row.patch_age_days,"?")} days · ${safeText(row.patch_reason,"UNKNOWN")}`,
+          tag:compliant ? "PATCH_COMPLIANT" : safeText(row.patch_reason,"PATCH_NOT_COMPLIANT")
+        });
+      }
+      if(prev.latest_hotfix_id !== row.latest_hotfix_id && row.latest_hotfix_id){
+        events.push({
+          ts,
+          type:"posture",
+          tone:"info",
+          title:"NEW HOTFIX EVIDENCE",
+          detail:`${safeText(prev.latest_hotfix_id,"none")} → ${safeText(row.latest_hotfix_id)} · installed ${formatDate(row.latest_hotfix_installed_on)}`,
+          tag:"PATCH EVIDENCE"
+        });
+      }
+      if(prev.agent_version !== row.agent_version && row.agent_version){
+        events.push({
+          ts,
+          type:"posture",
+          tone:"info",
+          title:"DEVICE AGENT VERSION CHANGED",
+          detail:`${safeText(prev.agent_version,"unknown")} → ${safeText(row.agent_version)}`,
+          tag:"AGENT"
+        });
+      }
+      prev = row;
+    }
+    for(const row of (Array.isArray(latestAccessLogs) ? latestAccessLogs : [])){
+      const allow = row.decision === "ALLOW";
+      events.push({
+        ts:eventTs(row.created_at),
+        type:"access",
+        tone:allow ? "good" : "bad",
+        title:allow ? "ACCESS GRANTED" : "ACCESS DENIED",
+        detail:`${safeText(row.username)} · ${safeText(row.device_id)} · ${safeText(row.method)} ${safeText(row.path)} · reason ${safeText(row.reason)}`,
+        tag:safeText(row.reason, allow ? "ALLOW" : "DENY"),
+        requestId:row.request_id || null,
+        accessLogId:row.id || null
+      });
+    }
+    if(
+        currentDevice &&
+        currentDevice.heartbeat_fresh !== true
+    ){
+        const latestHeartbeatEvent =
+            latestPersistedHeartbeatEvent(
+                currentDevice.device_id
+            );
+        const staleAlreadyPersisted =
+            latestHeartbeatEvent?.event_type ===
+            "DEVICE_HEARTBEAT_STALE";
+        if(!staleAlreadyPersisted){
+            const staleAt = currentDevice.last_seen
+                ? eventTs(currentDevice.last_seen) + 90000
+                : Date.now();
+            events.push({
+                ts:staleAt,
+                type:"live",
+                tone:"bad",
+                title:"LIVE HEARTBEAT STALE",
+                detail:
+                    `Last posture: ${formatDate(
+                        currentDevice.last_seen
+                    )} · awaiting persisted incident evidence.`,
+                tag:"DEVICE_STALE"
+            });
+        }
+    }
+    if(decisionIsStale && decisionStaleSince){
+      events.push({
+        ts:decisionStaleSince,
+        type:"live",
+        tone:"warn",
+        title:"CURRENT STATE CHANGED",
+        detail:"The latest observed access decision is historical. The next Data Vault request will be evaluated against current state.",
+        tag:"HISTORICAL DECISION"
+      });
+    }
+    return events
+      .filter(e => e.ts > 0)
+      .sort((a,b) => b.ts - a.ts)
+      .slice(0,24);
+  }
+  function securityEventKey(e){
+    return [
+      e.ts,
+      e.type,
+      e.tone,
+      e.title,
+      e.tag,
+      e.detail,
+      e.requestId || ""
+    ].join("|");
+  }
+  function renderSecurityEvents(){
+    const feed = qs("securityEventFeed");
+    if(!feed) return;
+    const events = buildSecurityEvents();
+    const denyCount = events.filter(e => e.type === "access" && e.tone === "bad").length;
+    const postureCount = events.filter(
+        e =>
+            e.type === "security" ||
+            e.type === "posture" ||
+            e.type === "recovery"
+    ).length;
+    qs("eventCount").textContent = events.length;
+    qs("eventDenyCount").textContent = denyCount;
+    qs("eventPostureCount").textContent = postureCount;
+    qs("eventLatest").textContent = events.length
+      ? compactEventTime(events[0].ts)
+      : "—";
+    const keys = events.map(securityEventKey);
+    const signature = JSON.stringify(keys);
+    // Important: loadDevices() runs every ~3 seconds. If the event list has not
+    // changed, do NOT touch innerHTML. This prevents visible blinking/flicker.
+    if(signature === lastSecurityEventSignature){
+      return;
+    }
+    if(!events.length){
+      feed.innerHTML = '<div class="empty">No correlated security events yet.</div>';
+      lastSecurityEventSignature = signature;
+      renderedSecurityEventKeys = new Set();
+      return;
+    }
+    const oldKeys = renderedSecurityEventKeys;
+    feed.innerHTML = events.map(e => {
+      const key = securityEventKey(e);
+      const isNew = !oldKeys.has(key);
+      const requestId = e.requestId || "";
+      const inspectable = e.type === "access" && requestId;
+      return `
+        <div
+          class="event-row ${e.tone}${isNew ? " event-new" : ""}${inspectable ? " inspectable" : ""}"
+          ${inspectable ? `data-request-id="${escapeHtml(requestId)}" tabindex="0" role="button" aria-label="Inspect decision ${escapeHtml(requestId)}" title="Open Decision Inspector"` : ""}
+        >
+          <div class="event-dot" aria-hidden="true"></div>
+          <div>
+            <div class="event-title">${escapeHtml(e.title)}</div>
+            <div class="event-detail">${escapeHtml(e.detail)}</div>
+          </div>
+          <div class="event-meta">
+            <span class="event-tag ${e.tone}">${eventTypeLabel(e.type)}</span>
+            <span class="event-tag ${e.tone}">${escapeHtml(e.tag)}</span>
+            <span class="event-time">${compactEventTime(e.ts)}</span>
+            ${inspectable ? '<span class="event-row-chevron" aria-hidden="true">›</span>' : ""}
+          </div>
+        </div>
+      `;
+    }).join("");
+    lastSecurityEventSignature = signature;
+    renderedSecurityEventKeys = new Set(keys);
+  }
+  async function loadSecurityEvents(
+      silent = false
+  ){
+      if(!token){
+          if(!silent){
+              toast("Login first");
+          }
+          return;
+      }
+      const { response, data } = await apiJson(
+          "/api/events?limit=50",
+          {
+              headers:authHeaders()
+          }
+      );
+      if(response.status === 401){
+          handleUnauthorized(
+              data,
+              silent
+          );
+          return;
+      }
+      if(!response.ok){
+          if(!silent){
+              toast(
+                  data?.detail ||
+                  "Failed to load security events"
+              );
+          }
+          return;
+      }
+      latestSecurityEvents =
+          Array.isArray(data)
+          ? data
+          : [];
+      renderSecurityEvents();
+  }
+  async function refreshSecurityEvents(){
+    if(!token){
+      toast("Authenticate first");
+      return;
+    }
+    await Promise.all([
+        loadDevices(true),
+        loadPostureHistory(true),
+        loadLogs(true),
+        loadSecurityEvents(true),
+        loadDemoControl(true)
+    ]);
+    renderSecurityEvents();
+    toast("Security timeline refreshed");
+  }
+  async function loadPostureHistory(silent = false){
+    if(!token){
+      if(!silent) toast("Login first");
+      return;
+    }
+    const id = qs("deviceId").value.trim();
+    const { response, data } = await apiJson(
+      `/api/devices/${encodeURIComponent(id)}/postures?limit=12`,
+      { headers:authHeaders() }
+    );
+    if(response.status === 401){
+      handleUnauthorized(data, silent);
+      return;
+    }
+    if(!response.ok){
+      if(!silent) toast(data?.detail || "Failed to load posture history");
+      return;
+    }
+    qs("rawHistory").textContent =
+      JSON.stringify(data, null, 2);
+    latestPostureHistory = Array.isArray(data) ? data : [];
+    renderSecurityEvents();
+    if(!Array.isArray(data) || data.length === 0){
+      qs("timeline").innerHTML =
+        '<div class="empty">No posture history available.</div>';
+      return;
+    }
+    qs("timeline").innerHTML = [...data]
+      .reverse()
+      .map(r => {
+        const ok =
+          r.firewall_enabled === true &&
+          r.pending_reboot !== true &&
+          r.patch_status === "updated";
+        const age =
+          r.patch_age_days == null
+            ? 18
+            : Math.min(60, Math.max(18, 60 - Number(r.patch_age_days)));
+        const time = new Date(r.reported_at).toLocaleTimeString([], {
+          hour:"2-digit",
+          minute:"2-digit"
+        });
+        return `
+          <div
+            class="timeline-item"
+            title="${formatDate(r.reported_at)} | ${safeText(r.patch_reason)}"
+          >
+            <div class="timeline-bar">
+              <div
+                class="timeline-fill ${ok ? "good" : "bad"}"
+                style="height:${age}px"
+              ></div>
+            </div>
+            <div class="timeline-time">${time}</div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+  function renderObservedDecision(row){
+    if(!row){
+      qs("metricDecision").textContent = "No observed access";
+      qs("metricDecision").style.color = "";
+      qs("metricReason").textContent =
+        "Waiting for a Data Vault request on the monitored device.";
+      qs("decisionWord").textContent = "IDLE";
+      qs("decisionWord").className = "decision-word idle";
+      setBadge(qs("decisionHttp"), "Audit", "neutral");
+      qs("decisionReason").textContent = "No observed decision";
+      qs("protectedRecords").innerHTML =
+        '<div class="empty">A new request from Data Vault will create the next protected-resource decision.</div>';
+      qs("rawDecision").textContent =
+        "No Data Vault decision observed for this monitored device.";
+      return;
+    }
+    const allowed = row.decision === "ALLOW";
+    qs("metricDecision").textContent = row.decision || "UNKNOWN";
+    qs("metricDecision").style.color =
+      allowed ? "var(--green)" : "var(--red)";
+    qs("metricReason").textContent = safeText(row.reason);
+    qs("decisionWord").textContent = safeText(row.decision);
+    qs("decisionWord").className =
+      `decision-word ${allowed ? "allow" : "deny"}`;
+    setBadge(
+      qs("decisionHttp"),
+      "Observed",
+      allowed ? "good" : "bad"
+    );
+    qs("decisionReason").textContent = safeText(row.reason);
+    qs("protectedRecords").innerHTML = `
+      <div class="empty">
+        Request originated in Data Vault as
+        <strong>${escapeHtml(row.username)}</strong>.
+        ${row.request_id
+          ? "Open Decision Inspector to verify the full persisted request path."
+          : "Legacy record: no correlation UUID is available."}
+      </div>
+    `;
+    qs("rawDecision").textContent =
+      JSON.stringify(row, null, 2);
+  }
+  async function loadLogs(silent = false){
+    if(!token){
+      if(!silent) toast("Login first");
+      return;
+    }
+    const { response, data } = await apiJson("/api/logs", {
+      headers:authHeaders()
+    });
+    if(response.status === 401){
+      handleUnauthorized(data, silent);
+      return;
+    }
+    if(!response.ok){
+      if(!silent) toast(data?.detail || "Failed to load logs");
+      return;
+    }
+    latestAccessLogs = Array.isArray(data) ? data : [];
+    const targetDeviceId = qs("deviceId").value.trim();
+    const targetLogs = latestAccessLogs.filter(
+      row => row.device_id === targetDeviceId
+    );
+    renderObservedDecision(targetLogs[0] || null);
+    renderSecurityEvents();
+    if(!Array.isArray(data) || data.length === 0){
+      qs("auditBody").innerHTML =
+        '<tr><td colspan="5" class="empty">No audit events.</td></tr>';
+      return;
+    }
+    qs("auditBody").innerHTML = data.slice(0,12).map(r => `
+      <tr>
+        <td class="mono">${new Date(r.created_at).toLocaleTimeString()}</td>
+        <td>${safeText(r.username)}</td>
+        <td>
+          <span class="badge ${r.decision === "ALLOW" ? "good" : "bad"}">
+            ${safeText(r.decision)}
+          </span>
+        </td>
+        <td class="mono">${escapeHtml(r.reason)}</td>
+        <td>
+          ${r.request_id
+            ? `<button class="audit-inspect-btn" type="button" data-inspect-request-id="${escapeHtml(r.request_id)}">Inspect</button>`
+            : '<span class="muted">Legacy</span>'}
+        </td>
+      </tr>
+    `).join("");
+  }
+  // ------------------------------------------------------------
+  // V1.4E DECISION INSPECTOR
+  // Reads only persisted evidence from /api/decisions/{request_id}.
+  // ------------------------------------------------------------
+  function evidenceState(value){
+    if(value === true) return { cls:"good", icon:"✓", text:"Verified" };
+    if(value === false) return { cls:"bad", icon:"✕", text:"Failed" };
+    return { cls:"neutral", icon:"—", text:"Not applicable" };
+  }
+  function evidenceItem(label, value, detail = ""){
+    const s = evidenceState(value);
+    return `
+      <div class="evidence-item ${s.cls}">
+        <span class="evidence-icon">${s.icon}</span>
+        <span><strong>${escapeHtml(label)}</strong>${detail ? `<br><span class="muted">${escapeHtml(detail)}</span>` : ""}</span>
+      </div>
+    `;
+  }
+  function boolEvidence(label, value, goodWhen = true, detail = ""){
+    if(value === null || value === undefined){
+      return evidenceItem(label, null, detail || "No captured value");
+    }
+    return evidenceItem(label, value === goodWhen, detail || String(value));
+  }
+  function decisionTone(decision){
+    return decision === "ALLOW" ? "good" : decision === "DENY" ? "bad" : "warn";
+  }
+  function renderDecisionInspector(d){
+    const body = qs("decisionInspectorBody");
+    const allow = d?.decision === "ALLOW";
+    const deny = d?.decision === "DENY";
+    const device = d?.device || {};
+    const identity = d?.identity || {};
+    const resource = d?.resource || {};
+    const opa = d?.opa || {};
+    const dataApi = d?.data_api || {};
+    const audit = d?.audit || {};
+    const realtime = d?.realtime || {};
+    const evidence = d?.evidence || {};
+    const request = d?.request || {};
+    const context = d?.context || {};
+    const dataFetched = dataApi.status === "FETCHED";
+    const dataBlocked = dataApi.status === "NOT_FETCHED_POLICY_DENY";
+    const dataFailed = dataApi.status === "FETCH_FAILED";
+    const dataNodeTone = dataFetched ? "good" : dataBlocked ? "good" : dataFailed ? "warn" : "warn";
+    const dataNodeStatus = dataFetched
+      ? "FETCHED · request ID verified"
+      : dataBlocked
+        ? "NOT FETCHED · enforcement verified"
+        : dataFailed
+          ? "FETCH FAILED after ALLOW"
+          : safeText(dataApi.status,"No delivery evidence");
+    const opaTone = allow ? "good" : deny ? "bad" : "warn";
+    const finalLinkClass = dataFetched ? "active" : dataBlocked ? "enforced" : dataFailed ? "active" : "";
+    const events = Array.isArray(realtime.event_types) ? realtime.event_types.join(", ") : "—";
+    body.innerHTML = `
+      <div class="inspector-summary">
+        <span class="badge ${decisionTone(d.decision)}">${escapeHtml(d.decision)}</span>
+        <span class="badge ${decisionTone(d.decision)}">${escapeHtml(d.reason)}</span>
+        <span class="badge neutral">${escapeHtml(d.policy_version,"Policy version unknown")}</span>
+        <span class="inspector-time">${escapeHtml(formatDate(d.created_at))}</span>
+      </div>
+      <div class="trace-panel">
+        <div class="trace-head">
+          <strong>Verified Request Path</strong>
+          <span class="trace-sub">${dataFetched ? "Sensitive payload delivery was correlated end-to-end." : dataBlocked ? "Policy DENY was enforced before the sensitive endpoint; no protected payload fetch occurred." : "Trace reconstructed from persisted evidence."}</span>
+        </div>
+        <div class="trace-path">
+          <div class="trace-node ${identity.authenticated === true ? "good" : "bad"}">
+            <div class="n">USER / JWT</div>
+            <div class="s">${escapeHtml(identity.username)} · ${escapeHtml(identity.role)}</div>
+          </div>
+          <div class="trace-link active"></div>
+          <div class="trace-node good">
+            <div class="n">ACCESS PROXY</div>
+            <div class="s">request_id generated + audit persisted</div>
+          </div>
+          <div class="trace-link active"></div>
+          <div class="trace-node ${opaTone}">
+            <div class="n">OPA · ${escapeHtml(d.decision)}</div>
+            <div class="s">${escapeHtml(opa.reason || d.reason)}</div>
+          </div>
+          <div class="trace-link ${finalLinkClass}"></div>
+          <div class="trace-node ${dataNodeTone}">
+            <div class="n">DATA API</div>
+            <div class="s">${escapeHtml(dataNodeStatus)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="inspector-grid">
+        <section class="inspect-card">
+          <h4>Identity & Request</h4>
+          <div class="kv-grid">
+            <div class="k">Username</div><div class="v">${escapeHtml(identity.username)}</div>
+            <div class="k">Role</div><div class="v">${escapeHtml(identity.role)}</div>
+            <div class="k">Authenticated</div><div class="v">${escapeHtml(identity.authenticated)}</div>
+            <div class="k">Method</div><div class="v mono">${escapeHtml(request.method || audit.method)}</div>
+            <div class="k">Path</div><div class="v mono">${escapeHtml(request.path || audit.path)}</div>
+            <div class="k">Request ID</div><div class="v mono">${escapeHtml(d.request_id)}</div>
+          </div>
+        </section>
+        <section class="inspect-card">
+          <h4>Protected Resource</h4>
+          <div class="kv-grid">
+            <div class="k">Resource</div><div class="v">${escapeHtml(resource.title, resource.id ? `#${resource.id}` : "—")}</div>
+            <div class="k">ID</div><div class="v mono">${escapeHtml(resource.id ?? audit.resource_id)}</div>
+            <div class="k">Category</div><div class="v">${escapeHtml(resource.category)}</div>
+            <div class="k">Sensitivity</div><div class="v"><span class="badge ${resource.sensitivity === "HIGH" ? "bad" : resource.sensitivity === "MEDIUM" ? "warn" : "good"}">${escapeHtml(resource.sensitivity || audit.resource_sensitivity)}</span></div>
+            <div class="k">Policy</div><div class="v mono">${escapeHtml(d.policy_version)}</div>
+            <div class="k">Context (lab)</div><div class="v">${escapeHtml(context.time_allowed)} · static demo input</div>
+          </div>
+        </section>
+        <section class="inspect-card wide">
+          <h4>Device Evidence at Evaluation Time</h4>
+          <div class="evidence-list">
+            ${boolEvidence("Registered device",device.registered,true,device.device_id || "")}
+            ${boolEvidence("Device trusted",device.trust_status === "trusted",true,`trust_status=${safeText(device.trust_status)}`)}
+            ${boolEvidence("Heartbeat fresh",device.heartbeat_fresh,true,device.heartbeat_age_seconds == null ? "" : `${Number(device.heartbeat_age_seconds).toFixed(2)}s old at evaluation`)}
+            ${boolEvidence("Firewall enabled",device.firewall_enabled,true)}
+            ${boolEvidence("Patch compliant",device.patch_status === "updated",true,`${safeText(device.latest_hotfix_id)} · age ${safeText(device.patch_age_days)}d · ${safeText(device.patch_reason)}`)}
+            ${boolEvidence("No pending reboot",device.pending_reboot,false)}
+            ${boolEvidence("Context allowed (lab)",context.time_allowed,true,"Static demo context input")}
+          </div>
+        </section>
+        <section class="inspect-card">
+          <h4>OPA Decision</h4>
+          <div class="kv-grid">
+            <div class="k">Decision</div><div class="v"><span class="badge ${opaTone}">${escapeHtml(d.decision)}</span></div>
+            <div class="k">Reason</div><div class="v mono">${escapeHtml(opa.reason || d.reason)}</div>
+            <div class="k">OPA allow</div><div class="v">${escapeHtml(opa.allow)}</div>
+            <div class="k">Snapshot time</div><div class="v">${escapeHtml(formatDate(d.created_at))}</div>
+          </div>
+        </section>
+        <section class="inspect-card">
+          <h4>Data API Correlation</h4>
+          <div class="kv-grid">
+            <div class="k">Status</div><div class="v mono">${escapeHtml(dataApi.status)}</div>
+            <div class="k">Path</div><div class="v mono">${escapeHtml(dataApi.path)}</div>
+            <div class="k">Gateway ID</div><div class="v mono">${escapeHtml(dataApi.request_id)}</div>
+            <div class="k">Upstream ID</div><div class="v mono">${escapeHtml(dataApi.upstream_request_id)}</div>
+            <div class="k">ID match</div><div class="v">${escapeHtml(dataApi.request_id_match)}</div>
+          </div>
+        </section>
+        <section class="inspect-card wide">
+          <h4>Persisted Audit & Realtime Evidence</h4>
+          <div class="evidence-list">
+            ${evidenceItem(`AccessLog #${safeText(audit.access_log_id)}`, evidence.access_log_persisted === true, "PostgreSQL access_logs")}
+            ${evidenceItem(`ACCESS_DECISION #${safeText(realtime.access_decision_event_id)}`, Boolean(realtime.access_decision_event_id), "Durable realtime event")}
+            ${evidenceItem(
+              dataFetched
+                ? "Sensitive payload fetched after ALLOW"
+                : dataBlocked
+                  ? "Sensitive payload blocked before fetch"
+                  : "Sensitive payload delivery",
+              dataFetched
+                ? evidence.sensitive_payload_fetched === true
+                : dataBlocked
+                  ? evidence.sensitive_payload_fetched === false
+                  : null,
+              dataBlocked
+                ? "Policy stopped the request before /internal/resources/{id}"
+                : safeText(dataApi.path)
+            )}
+            ${evidenceItem("Cross-service request ID match", evidence.data_api_request_id_match, dataFetched ? `Gateway = Internal API · ${safeText(dataApi.upstream_request_id)}` : "Not applicable when no upstream fetch occurred")}
+          </div>
+          <div class="kv-grid" style="margin-top:12px">
+            <div class="k">Realtime event types</div><div class="v mono">${escapeHtml(events)}</div>
+            <div class="k">Data API event ID</div><div class="v mono">${escapeHtml(realtime.data_api_event_id)}</div>
+            <div class="k">Access log ID</div><div class="v mono">${escapeHtml(audit.access_log_id)}</div>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+  async function openDecisionInspector(requestId){
+    if(!requestId){
+      toast("This is a legacy log without request correlation.");
+      return;
+    }
+    if(!token){
+      toast("Authenticate first");
+      return;
+    }
+    const backdrop = qs("decisionInspectorBackdrop");
+    qs("inspectorRequestId").textContent = requestId;
+    qs("decisionInspectorBody").innerHTML =
+      '<div class="inspector-loading">Loading persisted decision evidence…</div>';
+    backdrop.classList.add("open");
+    backdrop.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+    const { response, data } = await apiJson(
+      `/api/decisions/${encodeURIComponent(requestId)}`,
+      { headers:authHeaders() }
+    );
+    if(response.status === 401){
+      handleUnauthorized(data,false);
+      closeDecisionInspector();
+      return;
+    }
+    if(!response.ok){
+      qs("decisionInspectorBody").innerHTML =
+        `<div class="inspector-error">${escapeHtml(data?.detail || "Failed to load decision evidence")}</div>`;
+      return;
+    }
+    renderDecisionInspector(data);
+  }
+  function closeDecisionInspector(){
+    const backdrop = qs("decisionInspectorBackdrop");
+    backdrop.classList.remove("open");
+    backdrop.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+  async function copyInspectorRequestId(){
+    const id = qs("inspectorRequestId").textContent.trim();
+    if(!id || id === "No request selected") return;
+    try{
+      await navigator.clipboard.writeText(id);
+      toast("Request ID copied");
+    }catch{
+      toast(id);
+    }
+  }
+  qs("securityEventFeed").addEventListener("click", event => {
+    const row = event.target.closest("[data-request-id]");
+    if(row) openDecisionInspector(row.dataset.requestId);
+  });
+  qs("securityEventFeed").addEventListener("keydown", event => {
+    if(event.key !== "Enter" && event.key !== " ") return;
+    const row = event.target.closest("[data-request-id]");
+    if(!row) return;
+    event.preventDefault();
+    openDecisionInspector(row.dataset.requestId);
+  });
+  qs("auditBody").addEventListener("click", event => {
+    const button = event.target.closest("[data-inspect-request-id]");
+    if(button) openDecisionInspector(button.dataset.inspectRequestId);
+  });
+  qs("decisionInspectorBackdrop").addEventListener("click", event => {
+    if(event.target === qs("decisionInspectorBackdrop")){
+      closeDecisionInspector();
+    }
+  });
+  document.addEventListener("keydown", event => {
+    if(event.key === "Escape" && qs("decisionInspectorBackdrop").classList.contains("open")){
+      closeDecisionInspector();
+    }
+  });
+  async function refreshAll(){
+    if(!token){
+      toast("Authenticate first");
+      return;
+    }
+    await Promise.all([
+        loadDevices(true),
+        loadPostureHistory(true),
+        loadLogs(true),
+        loadSecurityEvents(true),
+        loadDemoControl(true)
+    ]);
+    updateSessionUI();
+    updateChecks();
+    updateSystemState();
+    startRealtimeBridge();
+  }
+  // ------------------------------------------------------------
+  // Initial render
+  // ------------------------------------------------------------
+  updateSessionUI();
+  updateChecks();
+  updateSystemState();
+  renderSecurityEvents();
+  renderDemoControl(null);
+
+// V1.5 IDENTITY WORKSPACE BACKDROP CLOSE
+const identityWorkspaceBackdrop = qs("identityWorkspaceBackdrop");
+const roleConfirmBackdrop = qs("roleConfirmBackdrop");
+roleConfirmBackdrop?.addEventListener("click", event => {
+  if(event.target === roleConfirmBackdrop){
+    closeRoleConfirmModal();
+  }
+});
+
+identityWorkspaceBackdrop?.addEventListener("click", event => {
+  if(event.target === identityWorkspaceBackdrop){
+    closeIdentityWorkspace();
+  }
+});
+
+</script>
+</body>
+</html>

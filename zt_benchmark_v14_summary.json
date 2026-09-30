@@ -1,0 +1,46 @@
+{
+  "benchmark": "Zero Trust Access Proxy V1.4 Final",
+  "method": {
+    "warmup_per_scenario": 10,
+    "measured_requests_per_scenario": 100,
+    "execution": "single-client sequential, rotating scenario order",
+    "environment": "local Docker Compose"
+  },
+  "scenarios": {
+    "baseline_internal_api": {
+      "n": 100,
+      "average_ms": 2.867965719995027,
+      "median_ms": 2.646373500056143,
+      "p95_ms": 4.257594000137033,
+      "min_ms": 1.6407279999839375,
+      "max_ms": 4.673027000080765,
+      "stdev_ms": 0.765801295086623
+    },
+    "opa_only": {
+      "n": 100,
+      "average_ms": 2.7726250199998503,
+      "median_ms": 2.390945999991345,
+      "p95_ms": 4.361925000011979,
+      "min_ms": 1.5142120000746218,
+      "max_ms": 11.317161000079068,
+      "stdev_ms": 1.3419314092442691
+    },
+    "full_zero_trust": {
+      "n": 100,
+      "average_ms": 72.21067832999779,
+      "median_ms": 65.5264869998291,
+      "p95_ms": 99.04494900001737,
+      "min_ms": 46.142550000013216,
+      "max_ms": 374.1928330000519,
+      "stdev_ms": 33.82711324579037
+    }
+  },
+  "overhead": {
+    "absolute_average_ms": 69.34271261000276,
+    "ratio_average": 25.17836173094949,
+    "increase_average_pct": 2417.836173094949,
+    "absolute_p95_ms": 94.78735499988034,
+    "opa_average_ms": 2.7726250199998503,
+    "opa_p95_ms": 4.361925000011979
+  }
+}
