@@ -13,7 +13,9 @@ import {
   KeyRound,
   LockKeyhole,
   LogOut,
+  Moon,
   RefreshCw,
+  Sun,
   ServerCog,
   Shield,
   ShieldAlert,
@@ -108,7 +110,16 @@ async function apiFetch(path, options = {}, session = null) {
   }
   return payload;
 }
-function Login({ onLogin }) {
+function ThemeSwitch({ theme, onChange, login = false }) {
+  return (
+    <div className={`theme-segment ${login ? "login-theme-segment" : ""}`} role="group" aria-label="Appearance theme">
+      <button type="button" className={theme === "light" ? "active" : ""} onClick={() => onChange("light")} aria-pressed={theme === "light"} title="Use light appearance"><Sun size={15} /><span>Light</span></button>
+      <button type="button" className={theme === "dark" ? "active" : ""} onClick={() => onChange("dark")} aria-pressed={theme === "dark"} title="Use dark appearance"><Moon size={15} /><span>Dark</span></button>
+    </div>
+  );
+}
+
+function Login({ onLogin, theme, onThemeChange }) {
   const [form, setForm] = useState({ username: "alice", password: "alice123", device_id: "DEV-001" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -167,6 +178,7 @@ function Login({ onLogin }) {
   };
   return (
     <main className="login-shell">
+      <ThemeSwitch theme={theme} onChange={onThemeChange} login />
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
       <section className="login-copy">
@@ -317,7 +329,7 @@ function AccessModal({ state, onClose }) {
     </div>
   );
 }
-function Vault({ session, onLogout, initialData = null }) {
+function Vault({ session, onLogout, initialData = null, theme, onThemeChange }) {
   const [resources, setResources] = useState(
     () => initialData?.resources || []
   );
@@ -798,6 +810,7 @@ function Vault({ session, onLogout, initialData = null }) {
       <header className="topbar">
         <div className="brand-row"><div className="brand-mark small"><Shield size={19} /><span>ZT</span></div><div><strong>Zero Trust Data Vault</strong><span>Resource-aware access portal</span></div></div>
         <div className="top-actions">
+          <ThemeSwitch theme={theme} onChange={onThemeChange} />
         <div
           className={
             `live-pill ${streamState}`
@@ -904,6 +917,17 @@ function Vault({ session, onLogout, initialData = null }) {
   );
 }
 export default function App() {
+  const [theme, setTheme] = useState(() => {
+    let saved = "dark";
+    try { saved = localStorage.getItem("zt-data-vault-theme") === "light" ? "light" : "dark"; } catch {}
+    document.documentElement.dataset.theme = saved;
+    return saved;
+  });
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem("zt-data-vault-theme", theme); } catch {}
+  }, [theme]);
+  const changeTheme = (next) => setTheme(next === "light" ? "light" : "dark");
   const [session, setSession] = useState(() => {
     try {
       const raw = sessionStorage.getItem("zt-vault-session");
@@ -925,6 +949,6 @@ export default function App() {
     setSession(null);
   };
   return session
-    ? <Vault session={session} onLogout={logout} initialData={bootstrap} />
-    : <Login onLogin={login} />;
+    ? <Vault session={session} onLogout={logout} initialData={bootstrap} theme={theme} onThemeChange={changeTheme} />
+    : <Login onLogin={login} theme={theme} onThemeChange={changeTheme} />;
 }

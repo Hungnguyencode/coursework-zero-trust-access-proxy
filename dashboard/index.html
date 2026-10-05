@@ -4,6 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Zero Trust Security Center</title>
+  <script>
+    (() => {
+      const key = 'zt-security-center-theme';
+      let theme = 'dark';
+      try { theme = localStorage.getItem(key) === 'light' ? 'light' : 'dark'; } catch {}
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
   <style>
     :root{
       --bg:#07101f;
@@ -602,7 +610,7 @@
       white-space:pre-wrap;
       word-break:break-word;
     }
-    
+
 /* ============================================================
    SECURITY EVENT TIMELINE — v1.3
    Persisted security events + access decisions +
@@ -1037,7 +1045,7 @@
       .inspector-grid,.evidence-list{grid-template-columns:1fr}
       .inspector-time{width:100%;margin-left:0}
     }
-  
+
     /* ==========================================================
        FINAL VISUAL POLISH — readable screenshots + filled hero
        ========================================================== */
@@ -1575,6 +1583,702 @@ body.role-modal-open{overflow:hidden}
   .role-confirm-actions .btn{width:100%}
 }
 
+
+
+
+
+    /* ==========================================================
+       UI LIGHT THEME V2.3 — TRACE SEMANTICS + LIGHT VISIBILITY
+       Original structure and existing icons only. No new markup.
+       ========================================================== */
+    .theme-segment{
+      display:inline-flex;
+      align-items:center;
+      gap:3px;
+      padding:3px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:rgba(255,255,255,.025);
+    }
+    .theme-choice{
+      min-height:31px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:0 10px;
+      border:0;
+      border-radius:9px;
+      background:transparent;
+      color:var(--muted);
+      cursor:pointer;
+      font-size:10px;
+      font-weight:850;
+      transition:background .16s ease,color .16s ease,box-shadow .16s ease;
+    }
+    .theme-choice.active{
+      color:#eef5ff;
+      background:linear-gradient(135deg,#2478ff,#4e8cff);
+      box-shadow:0 6px 18px rgba(36,120,255,.18);
+    }
+
+    html[data-theme="light"]{
+      color-scheme:light;
+      --bg:#cfe4ff;
+      --bg2:#edf6ff;
+      --panel:#fbfdff;
+      --panel2:#e5f1ff;
+      --border:#91b9e5;
+      --border-strong:#6198d3;
+      --text:#0b2442;
+      --muted:#466684;
+      --cyan:#008fd8;
+      --blue:#1b6ff0;
+      --green:#009b62;
+      --yellow:#d98200;
+      --red:#dc3654;
+      --shadow:0 18px 48px rgba(43,92,157,.13),0 3px 10px rgba(43,92,157,.06);
+    }
+    html[data-theme="light"] body{
+      color:var(--text);
+      background:
+        radial-gradient(920px 560px at 8% -8%,rgba(70,111,255,.38),transparent 60%),
+        radial-gradient(860px 520px at 100% 4%,rgba(33,196,240,.31),transparent 58%),
+        radial-gradient(760px 420px at 42% 100%,rgba(68,137,255,.17),transparent 64%),
+        linear-gradient(180deg,#eef5ff 0%,#dfedff 46%,#cfe4ff 100%);
+    }
+    html[data-theme="light"] .panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(247,251,255,.97));
+      border-color:#a9c8ec;
+      box-shadow:var(--shadow);
+    }
+    html[data-theme="light"] .panel:hover{
+      border-color:#86b3e4;
+      box-shadow:0 22px 54px rgba(43,92,157,.16),0 3px 10px rgba(43,92,157,.06);
+    }
+    html[data-theme="light"] .system-pill,
+    html[data-theme="light"] .portal-shortcut,
+    html[data-theme="light"] .theme-segment{
+      background:rgba(250,253,255,.98);
+      border-color:#8fb8e4;
+      box-shadow:0 8px 20px rgba(43,92,157,.12);
+    }
+    html[data-theme="light"] .portal-shortcut,
+    html[data-theme="light"] .identity-launch{
+      color:#12375d !important;
+      background:linear-gradient(180deg,#f7fbff,#e9f5ff) !important;
+      border-color:#72addf !important;
+    }
+    html[data-theme="light"] .portal-shortcut strong,
+    html[data-theme="light"] .identity-launch strong{
+      color:#0b2b4d !important;
+    }
+    html[data-theme="light"] .portal-shortcut small,
+    html[data-theme="light"] .identity-launch small{
+      color:#416e99 !important;
+    }
+    html[data-theme="light"] .theme-choice.active{
+      color:#fff;
+      background:linear-gradient(135deg,#1870f2,#4b91ff);
+      box-shadow:0 8px 20px rgba(24,112,242,.28);
+    }
+    html[data-theme="light"] .theme-choice.active span{color:#fff}
+    html[data-theme="light"] .brand-mark{
+      color:#0c84d8;
+      border-color:#8ec6ef;
+      background:linear-gradient(145deg,rgba(48,125,255,.14),rgba(35,210,241,.12));
+      box-shadow:inset 0 0 22px rgba(47,120,255,.09);
+    }
+    html[data-theme="light"] input{
+      color:#092441;
+      background:#f1f7ff;
+      border-color:#75a8dc;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(43,92,157,.04);
+      font-weight:650;
+    }
+    html[data-theme="light"] input::placeholder{color:#718ba7;opacity:1}
+    html[data-theme="light"] input:focus{
+      border-color:#438ee8;
+      box-shadow:0 0 0 3px rgba(47,120,255,.10);
+    }
+    html[data-theme="light"] .btn{
+      color:#173250;
+      background:linear-gradient(180deg,#ffffff,#eff6ff);
+      border-color:#96b9e2;
+      box-shadow:0 4px 10px rgba(43,92,157,.08);
+    }
+    html[data-theme="light"] .btn:hover{
+      border-color:#5f9fe1;
+      filter:saturate(1.05) brightness(1.015);
+    }
+    html[data-theme="light"] .btn.primary{
+      color:#fff;
+      background:linear-gradient(135deg,#1472f4,#408dff);
+      border-color:#2e7ef2;
+      box-shadow:0 10px 24px rgba(25,111,240,.28);
+    }
+    html[data-theme="light"] .btn.good{
+      color:#057a50;
+      background:linear-gradient(180deg,#f2fff9,#e7fbf2);
+      border-color:rgba(0,168,107,.42);
+    }
+    html[data-theme="light"] .btn.danger{
+      color:#d93653;
+      background:linear-gradient(180deg,#fff8f9,#fff0f3);
+      border-color:rgba(229,64,93,.38);
+    }
+
+    html[data-theme="light"] .metric,
+    html[data-theme="light"] .trust-hero,
+    html[data-theme="light"] .check,
+    html[data-theme="light"] .decision-main,
+    html[data-theme="light"] .reason-box,
+    html[data-theme="light"] .record,
+    html[data-theme="light"] .event-stat,
+    html[data-theme="light"] .timeline-bar,
+    html[data-theme="light"] .timeline-legend,
+    html[data-theme="light"] .raw-details summary{
+      background:linear-gradient(180deg,#f8fbff,#edf6ff);
+      border-color:#b2cceb;
+    }
+    html[data-theme="light"] .metric .value.allow,
+    html[data-theme="light"] .decision-word.allow{color:#009a62}
+    html[data-theme="light"] .metric .value.deny,
+    html[data-theme="light"] .decision-word.deny{color:#df3d59}
+    html[data-theme="light"] .decision-word.stale{color:#dc8500}
+
+    html[data-theme="light"] .badge.good{
+      color:#008a58;
+      background:#e9fbf3;
+      border-color:rgba(0,168,107,.30);
+    }
+    html[data-theme="light"] .badge.bad{
+      color:#db3c58;
+      background:#fff0f3;
+      border-color:rgba(229,64,93,.30);
+    }
+    html[data-theme="light"] .badge.warn{
+      color:#bf7100;
+      background:#fff6df;
+      border-color:rgba(236,146,0,.32);
+    }
+    html[data-theme="light"] .badge.neutral{
+      color:#44698f;
+      background:#eff6ff;
+      border-color:#bfd2e8;
+    }
+    html[data-theme="light"] .badge:before{
+      box-shadow:0 0 10px currentColor;
+    }
+
+    html[data-theme="light"] .hero-overview{
+      background:
+        radial-gradient(540px 300px at 94% 4%,rgba(44,206,239,.18),transparent 64%),
+        linear-gradient(145deg,#ffffff 0%,#f1f7ff 58%,#e9f5ff 100%);
+      border-color:#9fc4e9;
+      box-shadow:inset 0 1px 0 #fff,0 10px 26px rgba(43,92,157,.07);
+    }
+    html[data-theme="light"] .overview-item,
+    html[data-theme="light"] .overview-route{
+      background:rgba(255,255,255,.92);
+      border-color:#acd0ee;
+      box-shadow:0 7px 18px rgba(43,92,157,.06);
+    }
+    html[data-theme="light"] .route-node{
+      color:#153758;
+      background:linear-gradient(180deg,#f4faff,#e4f4ff);
+      border-color:#63ade2;
+      box-shadow:0 7px 16px rgba(7,158,231,.08);
+    }
+    html[data-theme="light"] .route-node.opa{
+      color:#176146;
+      background:linear-gradient(180deg,#f0fff8,#e2f8ed);
+      border-color:#65c79c;
+    }
+
+    html[data-theme="light"] .check.pass .check-icon{
+      color:#008f5c;
+      background:#e7fbf2;
+      border-color:rgba(0,168,107,.30);
+    }
+    html[data-theme="light"] .check.fail .check-icon{
+      color:#dc3d59;
+      background:#fff0f3;
+      border-color:rgba(229,64,93,.30);
+    }
+    html[data-theme="light"] .check.unknown .check-icon{
+      color:#c47700;
+      background:#fff5dc;
+      border-color:rgba(236,146,0,.30);
+    }
+    html[data-theme="light"] .check-state{color:#4b6e92}
+
+    html[data-theme="light"] .demo-note{
+      color:#885b00;
+      background:linear-gradient(90deg,#fff7df,#fffaf0);
+      border-color:#e8bd63;
+    }
+    html[data-theme="light"] .demo-control{
+      background:
+        linear-gradient(180deg,#fbfdff 0%,#edf6ff 100%);
+      border-color:#a8c8eb;
+      box-shadow:0 8px 20px rgba(43,92,157,.055);
+    }
+    html[data-theme="light"] .demo-control-sub{color:#557493}
+    html[data-theme="light"] .demo-footer{border-color:#b8cfe8}
+
+    html[data-theme="light"] .event-feed:before{
+      background:linear-gradient(180deg,rgba(7,158,231,.42),rgba(116,153,202,.28));
+    }
+    html[data-theme="light"] .event-row{
+      border-bottom-color:#c6d9ed;
+    }
+    html[data-theme="light"] .event-dot{
+      border-color:#f8fbff;
+      background:#6a84a4;
+      box-shadow:0 0 0 1px rgba(74,108,148,.38),0 0 15px rgba(74,108,148,.10);
+    }
+    html[data-theme="light"] .event-row.good .event-dot{
+      background:#00b778;
+      box-shadow:0 0 0 1px rgba(0,183,120,.52),0 0 15px rgba(0,183,120,.24);
+    }
+    html[data-theme="light"] .event-row.bad .event-dot{
+      background:#f04464;
+      box-shadow:0 0 0 1px rgba(240,68,100,.50),0 0 15px rgba(240,68,100,.24);
+    }
+    html[data-theme="light"] .event-row.warn .event-dot{
+      background:#f3a20b;
+      box-shadow:0 0 0 1px rgba(243,162,11,.50),0 0 15px rgba(243,162,11,.22);
+    }
+    html[data-theme="light"] .event-row.info .event-dot{
+      background:#12aeea;
+      box-shadow:0 0 0 1px rgba(18,174,234,.50),0 0 15px rgba(18,174,234,.22);
+    }
+    html[data-theme="light"] .event-tag{
+      color:#42698f;
+      background:#f2f8ff;
+      border-color:#b8cfe8;
+    }
+    html[data-theme="light"] .event-tag.good{
+      color:#00794d;
+      background:#d9f8e9;
+      border-color:rgba(0,155,98,.42);
+    }
+    html[data-theme="light"] .event-tag.bad{
+      color:#c92d49;
+      background:#ffe3e9;
+      border-color:rgba(220,54,84,.42);
+    }
+    html[data-theme="light"] .event-tag.warn{
+      color:#a85e00;
+      background:#ffefc7;
+      border-color:rgba(217,130,0,.43);
+    }
+    html[data-theme="light"] .event-tag.info{
+      color:#006fae;
+      background:#dff4ff;
+      border-color:rgba(0,143,216,.42);
+    }
+    html[data-theme="light"] .event-time{color:#6683a4}
+    html[data-theme="light"] .event-stat .k{color:#6683a4}
+    html[data-theme="light"] .event-stat .v.good{color:#008f5c}
+    html[data-theme="light"] .event-stat .v.bad{color:#db3c58}
+    html[data-theme="light"] .event-stat .v.warn{color:#bf7100}
+    html[data-theme="light"] .event-stat .v.info{color:#087fb7}
+
+    html[data-theme="light"] .timeline-bar{
+      background:#d9eaff;
+      border-color:#7eb1e0;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
+    }
+    html[data-theme="light"] .timeline-fill.good{
+      background:linear-gradient(180deg,#00bb79 0%,#37d99d 55%,#7be2bd 100%);
+      box-shadow:0 -5px 16px rgba(0,155,98,.20);
+    }
+    html[data-theme="light"] .timeline-fill.bad{
+      background:linear-gradient(180deg,#e63557 0%,#f45a75 58%,#ff9aaa 100%);
+      box-shadow:0 -5px 16px rgba(220,54,84,.18);
+    }
+
+    html[data-theme="light"] .inspector-backdrop{
+      background:rgba(49,78,119,.36);
+      backdrop-filter:blur(9px) saturate(112%);
+    }
+    html[data-theme="light"] .inspector-modal{
+      color:#15314f;
+      background:
+        radial-gradient(circle at 100% 0%,rgba(45,204,239,.15),transparent 30%),
+        linear-gradient(180deg,#ffffff,#edf6ff);
+      border-color:#8eb8e2;
+      box-shadow:0 30px 88px rgba(38,77,129,.27);
+    }
+    html[data-theme="light"] .inspector-head{
+      background:rgba(249,252,255,.96);
+      border-color:#b8cfe8;
+    }
+    html[data-theme="light"] .inspector-request,
+    html[data-theme="light"] .inspector-time{color:#5b7898}
+    html[data-theme="light"] .inspector-close{
+      color:#173250;
+      background:#f3f8ff;
+      border-color:#a8c5e5;
+    }
+    html[data-theme="light"] .trace-panel,
+    html[data-theme="light"] .inspect-card,
+    html[data-theme="light"] .evidence-item{
+      background:linear-gradient(180deg,#f8fbff,#eaf4ff);
+      border-color:#9fc1e6;
+    }
+    html[data-theme="light"] .trace-node{
+      color:#123653;
+      background:linear-gradient(180deg,#f2f8ff,#deedff);
+      border-color:#72aade;
+      box-shadow:0 6px 16px rgba(43,92,157,.08);
+    }
+    html[data-theme="light"] .trace-node .s{color:#527393}
+    html[data-theme="light"] .trace-node.good{
+      background:linear-gradient(180deg,#e7fbf2,#d7f6e8);
+      border-color:rgba(0,155,98,.42);
+    }
+    html[data-theme="light"] .trace-node.bad{
+      background:linear-gradient(180deg,#fff0f3,#ffe1e7);
+      border-color:rgba(220,54,84,.42);
+    }
+    html[data-theme="light"] .trace-node.warn{
+      background:linear-gradient(180deg,#fff7df,#ffedc0);
+      border-color:rgba(217,130,0,.42);
+    }
+    html[data-theme="light"] .trace-link{background:#91b6db}
+    html[data-theme="light"] .inspect-card h4{color:#365c83}
+    html[data-theme="light"] .kv-grid .k{color:#6683a4}
+    html[data-theme="light"] .kv-grid .v{color:#163657}
+
+    html[data-theme="light"] .identity-workspace-backdrop{
+      background:
+        radial-gradient(circle at 18% 10%,rgba(62,132,255,.18),transparent 34%),
+        rgba(47,72,107,.44);
+      backdrop-filter:blur(12px);
+    }
+    html[data-theme="light"] .identity-workspace,
+    html[data-theme="light"] .role-confirm-modal{
+      color:#15314f;
+      background:
+        radial-gradient(620px 300px at 100% 0%,rgba(45,204,239,.15),transparent 64%),
+        linear-gradient(180deg,#ffffff,#edf6ff);
+      border-color:#8eb8e2;
+      box-shadow:0 30px 86px rgba(38,77,129,.27);
+    }
+    html[data-theme="light"] .identity-workspace-head{
+      background:rgba(249,252,255,.97);
+      border-color:#b7cfe8;
+    }
+    html[data-theme="light"] .identity-workspace-close,
+    html[data-theme="light"] .role-confirm-close{
+      color:#173250;
+      background:#f2f8ff;
+      border-color:#9ebee0;
+    }
+    html[data-theme="light"] .identity-overview-card,
+    html[data-theme="light"] .identity-user,
+    html[data-theme="light"] .role-state,
+    html[data-theme="light"] .role-context-item,
+    html[data-theme="light"] .identity-card{
+      background:linear-gradient(180deg,#fbfdff,#eef6ff);
+      border-color:#b2cceb;
+      box-shadow:0 7px 17px rgba(43,92,157,.05);
+    }
+    html[data-theme="light"] .identity-guidance,
+    html[data-theme="light"] .identity-role-lock,
+    html[data-theme="light"] .role-confirm-guidance{
+      color:#285b79;
+      background:#eaf9ff;
+      border-color:#8fd4eb;
+    }
+    html[data-theme="light"] .role-confirm-backdrop{background:rgba(49,78,119,.38)}
+    html[data-theme="light"] .toast{
+      color:#173250;
+      background:#fff;
+      border-color:#9fbfe3;
+    }
+    html[data-theme="light"] .decision-freshness{
+      color:#8a5900;
+      background:linear-gradient(90deg,#fff6db,#fffaf0);
+      border-color:#e7bf68;
+    }
+    html[data-theme="light"] .raw-details pre{
+      background:#102d50;
+      color:#e9f5ff;
+    }
+
+    @media(max-width:760px){
+      .theme-choice span{display:none}
+      .theme-choice{width:33px;padding:0}
+    }
+
+
+
+    /* ==========================================================
+       UI LIGHT THEME V2.2 — VIVID ACCENT REFINEMENTS
+       Refines V2.1 in place. No markup or layout changes.
+       ========================================================== */
+    html[data-theme="light"]{
+      --bg:#c7e1ff;
+      --bg2:#ebf5ff;
+      --panel:#fbfdff;
+      --panel2:#dfecff;
+      --border:#7faee3;
+      --border-strong:#4f90da;
+      --text:#061f39;
+      --muted:#35597c;
+      --cyan:#007fd4;
+      --blue:#0f67f1;
+      --green:#008f5a;
+      --yellow:#c97600;
+      --red:#d22f4d;
+      --shadow:0 20px 52px rgba(29,75,138,.15),0 4px 12px rgba(29,75,138,.07);
+    }
+    html[data-theme="light"] body{
+      background:
+        radial-gradient(920px 560px at 8% -8%,rgba(58,97,255,.42),transparent 60%),
+        radial-gradient(860px 520px at 100% 4%,rgba(22,194,240,.35),transparent 58%),
+        radial-gradient(760px 420px at 42% 100%,rgba(52,126,255,.20),transparent 64%),
+        linear-gradient(180deg,#ecf4ff 0%,#d8e9ff 46%,#c7e1ff 100%);
+    }
+    html[data-theme="light"] .panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.985),rgba(244,249,255,.975));
+      border-color:#8eb9e7;
+      box-shadow:var(--shadow);
+    }
+    html[data-theme="light"] .panel:hover{
+      border-color:#5e9bdd;
+      box-shadow:0 24px 58px rgba(29,75,138,.17),0 4px 12px rgba(29,75,138,.07);
+    }
+    html[data-theme="light"] .system-pill,
+    html[data-theme="light"] .portal-shortcut,
+    html[data-theme="light"] .theme-segment{
+      background:linear-gradient(180deg,rgba(255,255,255,.99),rgba(246,250,255,.985));
+      border-color:#82b3e4;
+      box-shadow:0 10px 24px rgba(29,75,138,.12);
+    }
+    html[data-theme="light"] .portal-shortcut,
+    html[data-theme="light"] .identity-launch{
+      color:#11385d !important;
+      background:linear-gradient(180deg,#fbfdff,#eef6ff) !important;
+      border-color:#66a6df !important;
+      box-shadow:0 8px 20px rgba(29,75,138,.11);
+    }
+    html[data-theme="light"] .portal-shortcut strong,
+    html[data-theme="light"] .identity-launch strong{color:#0a2748 !important}
+    html[data-theme="light"] .portal-shortcut small,
+    html[data-theme="light"] .identity-launch small{color:#315d87 !important}
+    html[data-theme="light"] .brand-mark{
+      color:#0a80d8;
+      border-color:#75b9eb;
+      background:linear-gradient(145deg,rgba(34,118,255,.18),rgba(18,201,240,.16));
+      box-shadow:inset 0 0 24px rgba(15,103,241,.11);
+    }
+    html[data-theme="light"] input{
+      color:#071f3a;
+      background:#f4f9ff;
+      border-color:#6fa5dd;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.96),0 1px 2px rgba(29,75,138,.05);
+      font-weight:680;
+    }
+    html[data-theme="light"] input::placeholder{color:#6e88a4;opacity:1}
+    html[data-theme="light"] input:focus{
+      border-color:#2b80ec;
+      box-shadow:0 0 0 3px rgba(15,103,241,.12),0 4px 16px rgba(15,103,241,.08);
+    }
+    html[data-theme="light"] .btn{
+      color:#153252;
+      background:linear-gradient(180deg,#ffffff,#edf5ff);
+      border-color:#87b4e3;
+      box-shadow:0 4px 10px rgba(29,75,138,.08);
+    }
+    html[data-theme="light"] .btn:hover{border-color:#5595da;filter:saturate(1.08) brightness(1.01)}
+    html[data-theme="light"] .btn.primary{
+      color:#fff;
+      background:linear-gradient(135deg,#0e67f0,#4d94ff);
+      border-color:#2579f0;
+      box-shadow:0 12px 28px rgba(15,103,241,.30);
+    }
+    html[data-theme="light"] .metric,
+    html[data-theme="light"] .trust-hero,
+    html[data-theme="light"] .check,
+    html[data-theme="light"] .decision-main,
+    html[data-theme="light"] .reason-box,
+    html[data-theme="light"] .record,
+    html[data-theme="light"] .event-stat,
+    html[data-theme="light"] .timeline-bar,
+    html[data-theme="light"] .timeline-legend,
+    html[data-theme="light"] .raw-details summary{
+      background:linear-gradient(180deg,#f9fcff,#e9f4ff);
+      border-color:#9bc0e8;
+    }
+    html[data-theme="light"] .metric .value.allow,
+    html[data-theme="light"] .decision-word.allow{color:#00925b}
+    html[data-theme="light"] .metric .value.deny,
+    html[data-theme="light"] .decision-word.deny{color:#d4304f}
+    html[data-theme="light"] .decision-word.stale{color:#c77400}
+    html[data-theme="light"] .badge.good,
+    html[data-theme="light"] .event-tag.good{
+      color:#007e4f;
+      background:#d7f8e8;
+      border-color:rgba(0,143,90,.48);
+      box-shadow:0 0 0 1px rgba(255,255,255,.35) inset;
+    }
+    html[data-theme="light"] .badge.bad,
+    html[data-theme="light"] .event-tag.bad{
+      color:#c72d4a;
+      background:#ffe1e8;
+      border-color:rgba(210,47,77,.48);
+      box-shadow:0 0 0 1px rgba(255,255,255,.35) inset;
+    }
+    html[data-theme="light"] .badge.warn,
+    html[data-theme="light"] .event-tag.warn{
+      color:#a96200;
+      background:#ffecc0;
+      border-color:rgba(201,118,0,.48);
+      box-shadow:0 0 0 1px rgba(255,255,255,.35) inset;
+    }
+    html[data-theme="light"] .badge.info,
+    html[data-theme="light"] .event-tag.info{
+      color:#006eae;
+      background:#dbf3ff;
+      border-color:rgba(0,127,212,.47);
+      box-shadow:0 0 0 1px rgba(255,255,255,.35) inset;
+    }
+    html[data-theme="light"] .hero-overview{
+      background:
+        radial-gradient(540px 300px at 94% 4%,rgba(20,196,239,.23),transparent 64%),
+        linear-gradient(145deg,#ffffff 0%,#eef5ff 58%,#e4f0ff 100%);
+      border-color:#87b7e7;
+      box-shadow:inset 0 1px 0 #fff,0 12px 30px rgba(29,75,138,.09);
+    }
+    html[data-theme="light"] .overview-item,
+    html[data-theme="light"] .overview-route{
+      background:rgba(255,255,255,.95);
+      border-color:#95bfe8;
+      box-shadow:0 10px 22px rgba(29,75,138,.08);
+    }
+    html[data-theme="light"] .route-node,
+    html[data-theme="light"] .trace-node{
+      color:#0f3154;
+      background:linear-gradient(180deg,#f5faff,#dfedff);
+      border-color:#5fa3de;
+      box-shadow:0 9px 18px rgba(0,127,212,.10);
+    }
+    html[data-theme="light"] .route-node.opa,
+    html[data-theme="light"] .trace-node.good{
+      color:#0f6848;
+      background:linear-gradient(180deg,#e9fcf3,#d7f6e8);
+      border-color:rgba(0,143,90,.50);
+      box-shadow:0 9px 18px rgba(0,143,90,.10);
+    }
+    html[data-theme="light"] .hero-overview .route-link{
+      height:2px;
+      background:linear-gradient(90deg,rgba(0,127,212,.58),rgba(0,143,90,.62));
+      box-shadow:0 0 7px rgba(0,127,212,.12);
+    }
+    html[data-theme="light"] .hero-overview .route-link.gated{
+      background:linear-gradient(90deg,rgba(0,143,90,.66),rgba(0,127,212,.54));
+    }
+    html[data-theme="light"] .hero-overview .route-link i{
+      top:-3px;
+      width:25px;
+      height:7px;
+      opacity:1;
+      background:linear-gradient(90deg,transparent,#00bdf2 38%,#16d49d 62%,transparent);
+      box-shadow:0 0 11px rgba(0,143,216,.48);
+      animation-duration:1.65s;
+    }
+    html[data-theme="light"] .trace-node.bad{
+      color:#b92d46;
+      background:linear-gradient(180deg,#fff0f4,#ffe1e8);
+      border-color:rgba(210,47,77,.50);
+      box-shadow:0 9px 18px rgba(210,47,77,.08);
+    }
+    html[data-theme="light"] .trace-node.warn{
+      color:#9d5b00;
+      background:linear-gradient(180deg,#fff7df,#ffebbf);
+      border-color:rgba(201,118,0,.50);
+      box-shadow:0 9px 18px rgba(201,118,0,.08);
+    }
+    html[data-theme="light"] .trace-link{
+      height:2px;
+      background:linear-gradient(90deg,#5e9ee1,#56b9cb);
+      opacity:1;
+      box-shadow:0 0 8px rgba(0,127,212,.14);
+    }
+    html[data-theme="light"] .trace-link.active{
+      background:rgba(0,143,90,.34);
+    }
+    html[data-theme="light"] .trace-link.active:after{
+      width:38%;
+      background:linear-gradient(90deg,transparent,#00b874 46%,#47d9a7 58%,transparent);
+      opacity:1;
+      filter:saturate(1.18) drop-shadow(0 0 5px rgba(0,143,90,.42));
+      animation:traceFlow 1.20s linear infinite;
+    }
+    html[data-theme="light"] .trace-link.blocked{
+      background:repeating-linear-gradient(
+        90deg,
+        rgba(210,47,77,.88) 0 8px,
+        transparent 8px 13px
+      ) !important;
+      box-shadow:none;
+    }
+    html[data-theme="light"] .trace-link.enforced{
+      background:repeating-linear-gradient(
+        90deg,
+        rgba(0,143,90,.82) 0 8px,
+        transparent 8px 13px
+      ) !important;
+      box-shadow:0 0 8px rgba(0,143,90,.10);
+    }
+    html[data-theme="light"] .timeline-bar{
+      background:#d8e9ff;
+      border-color:#6ea6dc;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.60);
+    }
+    html[data-theme="light"] .timeline-fill.good{
+      background:linear-gradient(180deg,#00b36f 0%,#27cf90 54%,#79e3bf 100%);
+      box-shadow:0 -6px 18px rgba(0,143,90,.23);
+    }
+    html[data-theme="light"] .timeline-fill.bad{
+      background:linear-gradient(180deg,#df3656 0%,#f15a77 58%,#ff99ab 100%);
+      box-shadow:0 -6px 18px rgba(210,47,77,.19);
+    }
+    html[data-theme="light"] .check.pass .check-icon{color:#00875a;background:#def9ec;border-color:rgba(0,143,90,.38)}
+    html[data-theme="light"] .check.fail .check-icon{color:#cf2f4c;background:#ffe5ea;border-color:rgba(210,47,77,.38)}
+    html[data-theme="light"] .check.unknown .check-icon{color:#b66800;background:#ffefc9;border-color:rgba(201,118,0,.38)}
+    html[data-theme="light"] .demo-note{
+      color:#855300;
+      background:linear-gradient(90deg,#fff5d7,#fff9ea);
+      border-color:#e2b351;
+    }
+    html[data-theme="light"] .trace-panel,
+    html[data-theme="light"] .inspect-card,
+    html[data-theme="light"] .evidence-item{
+      background:linear-gradient(180deg,#f9fcff,#eaf4ff);
+      border-color:#92bbe6;
+      box-shadow:0 8px 20px rgba(29,75,138,.06);
+    }
+    html[data-theme="light"] .inspector-backdrop{
+      background:rgba(24,48,84,.44);
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+    }
+    html[data-theme="light"] .inspector-modal,
+    html[data-theme="light"] .identity-workspace,
+    html[data-theme="light"] .role-confirm-modal{
+      box-shadow:0 28px 86px rgba(29,75,138,.26);
+    }
+
+    /* V2.3: dark Security Center intentionally uses the original
+       inspector/backdrop/trace rules. This preserves the original animated
+       active link and dashed enforced/blocked semantics. */
+
 </style>
 </head>
 <body>
@@ -1588,7 +2292,11 @@ body.role-modal-open{overflow:hidden}
       </div>
     </div>
     <div class="topbar-actions">
-      
+      <div class="theme-segment" role="group" aria-label="Appearance theme">
+        <button id="themeLight" class="theme-choice" type="button" onclick="setTheme('light')" title="Use light appearance"><span aria-hidden="true">☀</span><span>Light</span></button>
+        <button id="themeDark" class="theme-choice" type="button" onclick="setTheme('dark')" title="Use dark appearance"><span aria-hidden="true">☾</span><span>Dark</span></button>
+      </div>
+
       <button
         class="portal-shortcut identity-launch"
         type="button"
@@ -1848,9 +2556,9 @@ body.role-modal-open{overflow:hidden}
     </div>
     <div class="demo-note">
       DEMO CONTROL PLANE:
-      SOC Admin changes security control state; OPA still makes each ALLOW/DENY decision automatically.
-      Device Trust changes the gateway trust state.
-      Firewall, Patch and Heartbeat simulate telemetry conditions only.
+      SOC Admin controls administrative device trust; OPA still makes each ALLOW/DENY decision automatically.
+      Device Trust changes the real gateway trust state.
+      Firewall, Patch and Heartbeat are lab telemetry simulations only.
       Real Windows Firewall and Windows Update settings are not modified.
     </div>
     <div class="demo-grid">
@@ -1861,7 +2569,7 @@ body.role-modal-open{overflow:hidden}
               Device Trust
             </div>
             <div class="demo-control-sub">
-              Real gateway trust-state control.
+              SOC administrative trust-state control.
             </div>
           </div>
           <span
@@ -2163,10 +2871,10 @@ body.role-modal-open{overflow:hidden}
       </div>
 
       <div class="identity-guidance">
-        New business identities are provisioned as <strong>VIEWER</strong> by default under least privilege.
-        Managed devices start <strong>UNTRUSTED</strong> and require Device Agent telemetry plus an explicit trust decision.
-        <strong>ANALYST</strong> eligibility is granted by the SOC administrator only when job function / need-to-know justifies HIGH-data access.
-        <strong>SECURITY-ADMIN</strong> is a protected control-plane role and is not assignable from this workflow.
+        Business identities are provisioned by SOC/IT as <strong>VIEWER</strong> by default under least privilege.
+        Each identity is assigned a managed endpoint; new devices start <strong>UNTRUSTED</strong> and require Device Agent telemetry plus an explicit SOC trust decision.
+        <strong>ANALYST</strong> eligibility is granted only when job function / need-to-know justifies HIGH-data access.
+        <strong>SECURITY-ADMIN</strong> remains a protected control-plane role and is not assignable from this workflow.
       </div>
 
       <div class="identity-grid">
@@ -2175,7 +2883,7 @@ body.role-modal-open{overflow:hidden}
             <div>
               <div class="identity-card-title">Provision business identity</div>
               <div class="identity-card-sub">
-                Create one business user and bind one managed device without bypassing Zero Trust policy.
+                Provision one business identity and assign one managed endpoint without bypassing Zero Trust policy.
               </div>
             </div>
             <span class="badge info">NEW USER</span>
@@ -2209,14 +2917,14 @@ body.role-modal-open{overflow:hidden}
 
             <div class="field full">
               <button class="btn primary" type="button" onclick="provisionUser()">
-                PROVISION USER + DEVICE
+                PROVISION IDENTITY + DEVICE
               </button>
             </div>
           </div>
 
           <div class="identity-note">
-            After provisioning, use COPY AGENT CMD for the new Device ID.
-            Business role and device trust stay as separate security controls.
+            After provisioning, SOC/IT runs the copied Device Agent setup on the assigned managed endpoint.
+            Business role and device trust remain separate security controls.
           </div>
         </div>
 
@@ -2338,6 +3046,25 @@ body.role-modal-open{overflow:hidden}
 </div>
 <div id="toast" class="toast"></div>
 <script>
+  const UI_THEME_KEY = "zt-security-center-theme";
+  function activeTheme(){
+    return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  }
+  function syncThemeSwitch(){
+    const light = activeTheme() === 'light';
+    const lightButton = document.getElementById('themeLight');
+    const darkButton = document.getElementById('themeDark');
+    if(lightButton){ lightButton.classList.toggle('active', light); lightButton.setAttribute('aria-pressed', String(light)); }
+    if(darkButton){ darkButton.classList.toggle('active', !light); darkButton.setAttribute('aria-pressed', String(!light)); }
+  }
+  function setTheme(theme){
+    const next = theme === 'light' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem(UI_THEME_KEY, next); } catch {}
+    syncThemeSwitch();
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', syncThemeSwitch, {once:true}); } else { syncThemeSwitch(); }
+
   // ============================================================
   // ZERO TRUST SECURITY CENTER — DASHBOARD v1.2
   //
@@ -3391,7 +4118,7 @@ async function updateDemoControl(
       `;
     }
   }
-  
+
 
 // V1.5 IDENTITY WORKSPACE NAVIGATION
 function openIdentityWorkspace(){
@@ -3518,7 +4245,7 @@ function renderManagedUsers(users){
               type="button"
               onclick="copyAgentCommand('${escapeHtml(device.device_id)}')"
             >
-              COPY AGENT CMD
+              COPY AGENT SETUP
             </button>
           ` : ""}
         </div>
@@ -3689,9 +4416,9 @@ async function copyAgentCommand(deviceId){
 
   try{
     await navigator.clipboard.writeText(command);
-    toast(`Agent command copied for ${deviceId}`);
+    toast(`Device Agent setup copied for ${deviceId}`);
   }catch{
-    window.prompt("Copy Device Agent command:", command);
+    window.prompt("Copy Device Agent setup command:", command);
   }
 }
 
@@ -3916,7 +4643,7 @@ function hasPersistedEvent(
                   eventTs(a.created_at)
           )[0] || null;
   }
-    
+
   function buildSecurityEvents(){
       const events = [];
       for(
