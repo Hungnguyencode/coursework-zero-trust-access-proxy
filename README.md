@@ -1,76 +1,119 @@
 # Zero Trust Access Proxy + Continuous Device Trust
 
-> **Đồ án môn Bảo mật dữ liệu · V1.5 FINAL**  
-> Zero Trust Access Proxy kết hợp **Continuous Device Trust**, **resource-aware authorization**, **policy-as-code** và **audit evidence**.
+> **Đồ án môn Bảo mật dữ liệu**
+> Prototype mô phỏng kiểm soát truy cập dữ liệu nội bộ theo kiến trúc **Zero Trust**, kết hợp **Continuous Device Trust**, **resource-aware authorization**, **policy-as-code**, **identity governance**, **realtime monitoring** và **audit evidence**.
 
 <p align="center">
   <img src="docs/screenshots/security-center-overview.png" alt="Zero Trust Security Center" width="100%">
 </p>
 
-## Tổng quan
+---
 
-Project mô phỏng một hệ thống truy cập dữ liệu nội bộ theo mô hình **Zero Trust**. Một user đăng nhập thành công và có JWT hợp lệ **không đồng nghĩa** với việc các request tiếp theo luôn được phép.
+## 1. Giới thiệu
 
-Mỗi request tới tài nguyên được bảo vệ được đánh giá lại dựa trên:
+Trong các mô hình kiểm soát truy cập truyền thống, việc người dùng đăng nhập thành công thường tạo ra một mức tin cậy kéo dài cho toàn bộ phiên làm việc. Cách tiếp cận này không còn phù hợp khi trạng thái thiết bị, vai trò người dùng, mức độ nhạy cảm của dữ liệu hoặc ngữ cảnh truy cập có thể thay đổi trong suốt phiên.
 
-- **Identity**: user hiện tại, trạng thái account, business role.
-- **Device**: registered device và trust state.
-- **Continuous posture**: heartbeat, firewall, patch evidence, pending reboot.
-- **Context**: method và request context.
-- **Resource sensitivity**: LOW / MEDIUM / HIGH.
-- **Policy**: quyết định cuối cùng từ **Open Policy Agent (OPA/Rego)**.
+Project này áp dụng nguyên tắc:
 
-Mục tiêu không chỉ là trả về `ALLOW` hoặc `DENY`, mà còn tạo ra **bằng chứng có thể giải thích, lưu trữ và truy vết** cho từng quyết định.
+> **Không mặc định tin cậy chỉ vì người dùng đã đăng nhập. Mỗi protected request phải được đánh giá lại bằng trạng thái hiện tại của identity, device, context và resource sensitivity.**
 
-> **Thông điệp chính:** Không mặc định tin cậy chỉ vì người dùng đã đăng nhập. Mỗi protected request phải được đánh giá lại bằng trạng thái hiện tại của identity, device, context và resource.
+Một JWT hợp lệ chỉ chứng minh rằng user đã được xác thực. Quyết định cuối cùng `ALLOW` hay `DENY` còn phụ thuộc vào:
+
+- danh tính và trạng thái tài khoản;
+- business role hiện tại;
+- managed device đã đăng ký hay chưa;
+- trust state của thiết bị;
+- độ mới của heartbeat;
+- firewall posture;
+- patch evidence;
+- pending reboot;
+- request method và context;
+- độ nhạy của resource;
+- policy được định nghĩa bằng OPA/Rego.
+
+Mục tiêu của hệ thống không chỉ là chặn hoặc cho phép truy cập. Mỗi quyết định còn phải tạo ra **bằng chứng có thể giải thích, lưu trữ và truy vết**.
 
 ---
 
-## Demo nhanh
+## 2. Mục tiêu của đồ án
 
-### Zero Trust Data Vault
+Project tập trung vào các mục tiêu chính:
 
-Business user yêu cầu quyền truy cập dữ liệu theo từng resource. Metadata được hiển thị trước; sensitive payload chỉ được fetch sau khi policy trả về `ALLOW`.
-
-<p align="center">
-  <img src="docs/screenshots/data-vault-overview.png" alt="Zero Trust Data Vault" width="100%">
-</p>
-
-### Identity Governance
-
-Business identity mới được provision với **VIEWER** theo nguyên tắc least privilege. Managed device bắt đầu ở trạng thái **UNTRUSTED**. `ANALYST` chỉ được cấp khi job function / need-to-know yêu cầu quyền truy cập HIGH data.
-
-<p align="center">
-  <img src="docs/screenshots/identity-governance.png" alt="Identity and Access Administration" width="100%">
-</p>
-
-Role elevation sử dụng confirmation modal riêng, đồng bộ với Security Center và hiển thị context của user/device trước khi thay đổi role.
-
-<p align="center">
-  <img src="docs/screenshots/role-elevation-modal.png" alt="Grant Analyst modal" width="78%">
-</p>
-
-### Zero Trust enforcement
-
-Một thiết bị có thể healthy, trusted và heartbeat fresh nhưng user vẫn bị chặn nếu business role không đủ cho resource sensitivity.
-
-<p align="center">
-  <img src="docs/screenshots/zero-trust-deny.png" alt="Zero Trust access denied" width="78%">
-</p>
-
-Mỗi request có `request_id` để correlation giữa policy decision, access log, realtime event và Internal API fetch evidence.
-
-<p align="center">
-  <img src="docs/screenshots/decision-inspector.png" alt="Decision Inspector" width="78%">
-</p>
+1. Áp dụng tư duy **Zero Trust** vào một luồng truy cập dữ liệu cụ thể.
+2. Tách **authentication** khỏi **authorization**.
+3. Đánh giá lại từng protected request thay vì tin cậy toàn bộ session.
+4. Kết hợp **identity**, **device posture**, **business role**, **request context** và **resource sensitivity** trong policy.
+5. Dùng **Open Policy Agent (OPA)** làm Policy Decision Point.
+6. Dùng Access Proxy làm Policy Enforcement Point.
+7. Lưu decision evidence phục vụ audit và giải thích.
+8. Minh họa continuous device trust bằng Device Agent và heartbeat.
+9. Hỗ trợ realtime monitoring cho Security Center.
+10. Xây dựng identity governance theo nguyên tắc least privilege.
+11. Tạo demo tái hiện rõ các trạng thái `ALLOW` và `DENY`.
+12. Đánh giá prototype bằng regression test và benchmark cục bộ.
 
 ---
 
-## Kiến trúc
+## 3. Các nguyên tắc Zero Trust được thể hiện
+
+### 3.1. Authentication không đồng nghĩa với authorization
+
+User có thể đăng nhập thành công nhưng vẫn bị từ chối khi:
+
+- thiết bị chưa trusted;
+- heartbeat stale;
+- firewall posture không đạt;
+- patch evidence không đạt;
+- máy đang pending reboot;
+- business role không đủ cho HIGH data;
+- context không hợp lệ.
+
+### 3.2. Healthy device không thay thế business authorization
+
+Một thiết bị có thể:
+
+```text
+registered
++ trusted
++ heartbeat fresh
++ firewall enabled
++ patch compliant
+```
+
+nhưng user vẫn có thể bị `DENY` nếu business role không đủ.
+
+Ví dụ:
+
+```text
+bob
+role = viewer
+device = trusted
+posture = healthy
+resource = HIGH
+→ DENY
+→ ROLE_DENIED_FOR_HIGH_DATA
+```
+
+### 3.3. Business role không thay thế device trust
+
+Ngược lại, một user `analyst` vẫn có thể bị chặn nếu device chưa trusted hoặc posture không đạt.
+
+### 3.4. Quyết định luôn dựa trên current state
+
+Protected request sử dụng trạng thái hiện tại trong hệ thống. Vì vậy:
+
+- trust state mới có thể thay đổi request tiếp theo;
+- posture mới có thể thay đổi request tiếp theo;
+- role mới có thể thay đổi request tiếp theo;
+- prototype không bắt buộc user login lại sau mỗi thay đổi role.
+
+---
+
+## 4. Kiến trúc tổng thể
 
 ```mermaid
 flowchart LR
-    U[Business User] --> DV[Data Vault]
+    U[Business User] --> DV[Zero Trust Data Vault]
     DV --> PX[Access Proxy / PEP]
 
     A[Device Agent] --> PX
@@ -87,18 +130,21 @@ flowchart LR
 
     PG --> SSE[SSE / Durable Events]
     SSE --> SC
+
+    NG[Nginx] --> SC
+    NG --> DV
 ```
 
-### Thành phần
+### 4.1. Các thành phần chính
 
 | Thành phần | Vai trò |
 |---|---|
-| **Data Vault** | Portal cho business user yêu cầu protected data |
-| **Access Proxy** | Policy Enforcement Point (PEP), authentication và policy-input aggregation |
-| **OPA / Rego** | Policy Decision Point (PDP), trả `ALLOW` / `DENY` |
-| **Internal API** | Chứa sensitive payload; chỉ được gọi sau `ALLOW` |
+| **Zero Trust Data Vault** | Portal cho business user yêu cầu protected data |
+| **Access Proxy** | Policy Enforcement Point, authentication, policy-input aggregation và enforcement |
+| **OPA / Rego** | Policy Decision Point, trả `ALLOW` / `DENY` |
+| **Internal API** | Chứa sensitive payload, chỉ được gọi sau `ALLOW` |
 | **PostgreSQL** | Lưu identity/device state, posture history, access logs, security events và realtime events |
-| **Device Agent** | Thu thập endpoint posture và heartbeat |
+| **Device Agent** | Gửi endpoint posture và heartbeat |
 | **Security Center** | Control-plane UI cho monitoring, trust control và identity governance |
 | **SSE** | Realtime wake-up path cho Security Center |
 | **Nginx** | Reverse proxy cho các portal/API trong lab |
@@ -117,9 +163,41 @@ data-vault
 
 ---
 
-## Resource-aware policy
+## 5. Luồng xử lý một protected request
 
-Ba resource mẫu có độ nhạy khác nhau:
+```mermaid
+sequenceDiagram
+    participant U as Business User
+    participant DV as Data Vault
+    participant PX as Access Proxy
+    participant DB as PostgreSQL
+    participant OPA as OPA/Rego
+    participant API as Internal API
+
+    U->>DV: Request protected resource
+    DV->>PX: JWT + device_id + resource
+    PX->>DB: Đọc identity/device/posture/current state
+    PX->>OPA: Policy input
+    OPA-->>PX: ALLOW / DENY + reason
+
+    alt DENY
+        PX->>DB: Persist access decision + event
+        PX-->>DV: DENY + reason
+    else ALLOW
+        PX->>API: Fetch sensitive payload + request_id
+        API-->>PX: Protected data
+        PX->>DB: Persist decision/evidence/events
+        PX-->>DV: ALLOW + payload
+    end
+```
+
+Điểm quan trọng là **Internal API không được gọi trước khi OPA trả về `ALLOW`**.
+
+---
+
+## 6. Resource-aware authorization
+
+Hệ thống có ba resource mẫu:
 
 | ID | Resource | Data owner | Sensitivity |
 |---:|---|---|---|
@@ -127,9 +205,7 @@ Ba resource mẫu có độ nhạy khác nhau:
 | 2 | Financial Risk Assessment | BluePeak Finance | MEDIUM |
 | 3 | Restricted Security Investigation | NovaSec Industries | HIGH |
 
-### LOW
-
-Yêu cầu cơ bản:
+### 6.1. LOW
 
 ```text
 authenticated
@@ -137,22 +213,23 @@ authenticated
 + valid GET
 ```
 
-LOW có thể vẫn được phép khi một số posture/trust signal đang degraded.
+LOW được thiết kế để minh họa rằng không phải mọi degraded posture đều phải dẫn tới cùng một policy result.
 
-### MEDIUM
+### 6.2. MEDIUM
 
 ```text
 authenticated
-+ registered
++ registered device
 + trusted device
 + fresh heartbeat
++ valid GET
 ```
 
-### HIGH
+### 6.3. HIGH
 
 ```text
 authenticated
-+ registered
++ registered device
 + privileged business role
 + trusted device
 + fresh heartbeat
@@ -163,53 +240,56 @@ authenticated
 + valid GET
 ```
 
-Các reason tiêu biểu:
+### 6.4. Một số decision reason tiêu biểu
 
 ```text
 DEVICE_UNTRUSTED
 DEVICE_STALE
-FIREWALL_DISABLED
-PATCH_TOO_OLD
-PENDING_REBOOT
 ROLE_DENIED_FOR_HIGH_DATA
+FIREWALL_DISABLED
+PATCH_EVIDENCE_MISSING
+PENDING_REBOOT
+PATCH_TOO_OLD
+CONTEXT_DENIED
+REQUEST_DENIED
 ALLOW
 ```
 
 ---
 
-## Identity Lifecycle V1.5
+## 7. Identity Governance và least privilege
 
-Hệ thống tách **business role** và **control-plane role**.
+Project tách rõ **business role** và **control-plane role**.
 
-### Business roles
+### 7.1. Business role
 
 ```text
 VIEWER
-   │
-   │ job function / need-to-know
-   ▼
+  │
+  │ job function / need-to-know
+  ▼
 ANALYST
 ```
 
-- `viewer`: role mặc định, least privilege.
-- `analyst`: role business nâng cao, có eligibility cho HIGH data khi các policy condition khác cùng đạt.
+- `viewer`: role mặc định, áp dụng nguyên tắc least privilege.
+- `analyst`: business role nâng cao, có eligibility truy cập HIGH data nếu các điều kiện khác cùng đạt.
 
-### Protected control-plane role
+### 7.2. Protected control-plane role
 
 ```text
 SECURITY-ADMIN
 ```
 
-`security-admin` không phải là “analyst mạnh hơn”. Đây là role quản trị security/control plane và **không thể được gán qua workflow VIEWER ↔ ANALYST**.
+`security-admin` là role dành cho security/control plane. Đây **không phải** là phiên bản mạnh hơn của `analyst` và không thể được cấp qua workflow `VIEWER ↔ ANALYST`.
 
-Flow provisioning:
+### 7.3. Enterprise-style provisioning flow
 
 ```text
 Trusted administrator
         ↓
 Provision business identity
         ↓
-VIEWER + registered managed device
+VIEWER + managed device
         ↓
 Device starts UNTRUSTED
         ↓
@@ -217,7 +297,7 @@ Device Agent reports posture
         ↓
 Heartbeat becomes FRESH
         ↓
-SOC makes explicit device-trust decision
+SOC/IT makes explicit device-trust decision
         ↓
 TRUSTED
         ↓
@@ -230,11 +310,11 @@ GRANT ANALYST when need-to-know justifies it
 Next protected request is reevaluated
 ```
 
-Điểm đáng chú ý: protected request dùng **role hiện tại trong database**, vì vậy khi `VIEWER → ANALYST`, request tiếp theo có thể thay đổi quyết định **mà không bắt buộc user phải login lại**.
+Trong prototype, `device_id` được nhập khi provisioning để mô phỏng identity của managed endpoint. Trong môi trường enterprise thật, giá trị này thường đến từ asset inventory, MDM hoặc endpoint management platform.
 
 ---
 
-## Continuous Device Trust
+## 8. Continuous Device Trust
 
 Device Agent:
 
@@ -242,7 +322,7 @@ Device Agent:
 device_agent/agent.py
 ```
 
-Các signal chính:
+Các posture signal chính:
 
 - hostname / Windows version;
 - Windows Firewall state;
@@ -252,9 +332,15 @@ Các signal chính:
 - patch compliance;
 - heartbeat / `last_seen`.
 
-Heartbeat được xem là stale sau khoảng **90 giây**.
+Heartbeat được xem là stale sau khoảng:
 
-Một agent process đại diện cho một **logical device identity**:
+```text
+90 giây
+```
+
+Một process Device Agent đại diện cho một logical endpoint/device identity.
+
+Ví dụ:
 
 ```powershell
 # DEV-001
@@ -263,34 +349,107 @@ python .\device_agent\agent.py
 # DEV-002
 python .\device_agent\agent.py --device-id DEV-002
 
-# Custom provisioned device
+# Một device được provision thêm
 python .\device_agent\agent.py --device-id DEV-003
 ```
 
-Trong lab, nhiều logical device có thể cùng chạy trên một máy Windows; muốn nhiều device cùng `FRESH` tại cùng thời điểm thì chạy một agent instance cho mỗi `device_id`.
+Trong lab, nhiều logical device có thể chạy trên cùng một máy Windows bằng nhiều terminal riêng. Muốn nhiều device cùng có heartbeat `FRESH`, cần duy trì một agent instance cho mỗi `device_id`.
 
 ---
 
-## Demo Control Plane
+## 9. Demo Control Plane
 
-Security Center có các control phục vụ demo:
+Security Center có các control phục vụ việc trình diễn policy response:
 
 | Control | Ý nghĩa |
 |---|---|
-| `TRUSTED / REVOKE` | Thay đổi gateway device-trust state thật trong prototype |
+| `TRUSTED / REVOKE` | Thay đổi gateway device-trust state trong prototype |
 | `NORMAL / SIMULATE OFF` | Giả lập firewall telemetry bị tắt |
 | `NORMAL / SIMULATE OLD` | Giả lập patch evidence quá cũ |
 | `NORMAL / SIMULATE LOSS` | Giả lập mất posture/heartbeat delivery |
 
-**Firewall / Patch / Heartbeat simulation không sửa Windows Firewall hoặc Windows Update thật.** Mục đích là tái hiện an toàn, lặp lại được các trạng thái posture xấu để quan sát policy response.
+### Phân biệt trust control và simulation
 
-`Device Trust` khác với ba simulation trên: đây là control-plane trust state mà gateway sử dụng trực tiếp trong policy evaluation.
+`Device Trust` là trạng thái quản trị được gateway sử dụng trực tiếp khi policy evaluation.
+
+Ba control Firewall / Patch / Heartbeat là **simulation phục vụ demo**. Chúng:
+
+- không tắt Windows Firewall thật;
+- không gỡ Windows Update;
+- không làm thay đổi cấu hình hệ điều hành thật.
+
+Mục tiêu là tạo trạng thái posture xấu theo cách an toàn, lặp lại được và dễ quan sát.
 
 ---
 
-## Realtime monitoring và audit evidence
+## 10. Zero Trust Data Vault
 
-Các event tiêu biểu:
+Data Vault là business-facing portal để user:
+
+- login;
+- xem metadata resource;
+- xem mức sensitivity;
+- gửi request truy cập;
+- nhận `ALLOW` hoặc `DENY`;
+- xem reason và decision evidence liên quan.
+
+<p align="center">
+  <img src="docs/screenshots/data-vault-overview.png" alt="Zero Trust Data Vault" width="100%">
+</p>
+
+Sensitive payload không được tải trước. Payload chỉ được fetch sau khi Access Proxy nhận kết quả `ALLOW` từ OPA.
+
+---
+
+## 11. Security Center
+
+Security Center là control-plane UI để:
+
+- theo dõi Zero Trust decisions;
+- xem device trust và posture;
+- xem heartbeat freshness;
+- sử dụng demo control;
+- quản lý business identity;
+- thực hiện Viewer ↔ Analyst role assignment;
+- inspect request correlation;
+- theo dõi realtime security event;
+- xem audit evidence.
+
+### 11.1. Identity Administration
+
+Business identity mới được provision theo mặc định:
+
+```text
+role = viewer
+device = registered
+trust = untrusted
+```
+
+<p align="center">
+  <img src="docs/screenshots/identity-governance.png" alt="Identity and Access Administration" width="100%">
+</p>
+
+Role elevation sử dụng confirmation modal riêng nhằm giảm thao tác cấp quyền nhầm và giúp operator quan sát context trước khi thay đổi role.
+
+<p align="center">
+  <img src="docs/screenshots/role-elevation-modal.png" alt="Grant Analyst modal" width="78%">
+</p>
+
+### 11.2. Light/Dark theme
+
+Phiên bản UI cuối hỗ trợ:
+
+- Dark theme theo phong cách Security Operations;
+- Light theme blue-forward với semantic colors rõ ràng;
+- màu xanh, đỏ, vàng, cyan thể hiện trạng thái policy/posture;
+- Decision Inspector giữ semantics khác nhau giữa successful path và denied path;
+- denied connector được biểu diễn dạng đứt đoạn để thể hiện payload fetch không xảy ra.
+
+---
+
+## 12. Realtime monitoring và durable audit evidence
+
+Một số event tiêu biểu:
 
 ```text
 DEVICE_POSTURE_REPORTED
@@ -299,7 +458,7 @@ ACCESS_DECISION
 DATA_API_FETCHED
 ```
 
-Security Center sử dụng:
+Security Center sử dụng mô hình:
 
 ```text
 SSE        → fast wake-up path
@@ -308,13 +467,13 @@ Polling    → fallback
 PostgreSQL → durable source of truth
 ```
 
-Khi event mới tới, UI debounce ngắn rồi đọc lại authoritative state từ REST. Polling định kỳ vẫn được giữ làm fallback khi SSE reconnect hoặc miss event.
+Khi event mới tới, UI debounce ngắn rồi đọc lại authoritative state qua REST. Polling vẫn được giữ làm fallback nếu SSE reconnect hoặc bỏ lỡ event.
 
 ---
 
-## Request Correlation & Decision Inspector
+## 13. Request Correlation và Decision Inspector
 
-Mỗi protected request có một UUID:
+Mỗi protected request có một:
 
 ```text
 request_id
@@ -336,7 +495,7 @@ Realtime Event
 Internal API (chỉ khi ALLOW)
 ```
 
-Decision Inspector giúp kiểm tra:
+Decision Inspector có thể hiển thị:
 
 - decision / reason;
 - request ID;
@@ -350,6 +509,10 @@ Decision Inspector giúp kiểm tra:
 - realtime-event evidence;
 - Data API fetch status.
 
+<p align="center">
+  <img src="docs/screenshots/decision-inspector.png" alt="Decision Inspector" width="78%">
+</p>
+
 Invariant quan trọng:
 
 ```text
@@ -357,11 +520,17 @@ DENY  → không có DATA_API_FETCHED
 ALLOW → request_id được propagate và verify tới Internal API
 ```
 
+Ví dụ một user có device healthy nhưng role không đủ cho HIGH data:
+
+<p align="center">
+  <img src="docs/screenshots/zero-trust-deny.png" alt="Zero Trust access denied" width="78%">
+</p>
+
 ---
 
-## Tài khoản demo
+## 14. Tài khoản demo
 
-> Các credential dưới đây chỉ dành cho **local academic lab**, không sử dụng cho production.
+> Các credential dưới đây chỉ dành cho **local academic lab**. Không sử dụng cho production.
 
 | Username | Password | Device | Role |
 |---|---|---|---|
@@ -369,106 +538,91 @@ ALLOW → request_id được propagate và verify tới Internal API
 | `bob` | `bob123` | `DEV-002` | `viewer` |
 | `socadmin` | `socadmin123` | `SOC-001` | `security-admin` |
 
-Alice/Bob là demo fixtures để regression nhanh. V1.5 có thể provision thêm business identity mới từ **Identity & Access Administration**.
+Alice và Bob là demo fixture để regression nhanh. Business identity mới có thể được provision từ Identity & Access Administration.
 
 ---
 
-## Quick Start
+## 15. Kết quả kiểm thử và QA
 
-### Yêu cầu
+Project có hai lớp regression chính.
 
-- Windows 10/11 cho Device Agent demo.
-- Docker Desktop / Docker Engine.
-- Docker Compose v2.
-- Python 3.
-- PowerShell.
+### 15.1. Policy regression
 
-### 1. Chuẩn bị Python environment cho agent
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r .\device_agent\requirements.txt
-```
-
-### 2. Tạo secret local
-
-Copy `.env.example` thành `.env`, sau đó tạo hai secret ngẫu nhiên:
-
-```powershell
-$jwtSecret = python -c "import secrets; print(secrets.token_urlsafe(48))"
-$internalSecret = python -c "import secrets; print(secrets.token_urlsafe(48))"
-
-@"
-JWT_SECRET=$jwtSecret
-INTERNAL_SHARED_SECRET=$internalSecret
-"@ | Set-Content .\.env -Encoding ascii
-```
-
-`.env` **không được commit**.
-
-### 3. Validate và khởi động
-
-```powershell
-docker compose config -q
-docker compose up -d --build
-docker compose ps
-```
-
-Mở:
+File:
 
 ```text
-Security Center : http://localhost:8081
-Data Vault      : http://localhost:8082
+tests/policy_regression.py
 ```
 
-> Khi dùng database volume mới, áp dụng các migration SQL trong `migrations/` theo thứ tự số `001 → 005` phù hợp với state của database.
+Mục tiêu:
 
----
+- gọi trực tiếp OPA HTTP API;
+- kiểm tra policy behavior theo nhiều tổ hợp identity/device/posture/resource;
+- xác nhận các reason quan trọng;
+- tránh regression khi thay đổi Rego policy.
 
-## Kịch bản demo khuyến nghị
-
-Một flow ngắn nhưng thể hiện gần như toàn bộ ý tưởng của project:
+Kết quả tại checkpoint QA backend/policy:
 
 ```text
-1. SOC provision user mới
-   → VIEWER + DEV-003 UNTRUSTED
-
-2. User login Data Vault
-   → LOW ALLOW
-   → MEDIUM/HIGH DENY DEVICE_UNTRUSTED
-
-3. Start DEV-003 Device Agent
-   → heartbeat FRESH
-   → firewall/patch evidence healthy
-   → device vẫn UNTRUSTED
-
-4. SOC TRUST DEV-003
-   → MEDIUM ALLOW
-   → HIGH DENY ROLE_DENIED_FOR_HIGH_DATA
-
-5. SOC GRANT ANALYST
-   → không login lại
-   → request HIGH lần nữa
-   → ALLOW
-
-6. Security Center
-   → realtime decision update
-   → audit evidence
-   → Decision Inspector / request correlation
+14 / 14 PASS
 ```
 
-Flow này cho thấy rõ:
+### 15.2. API regression
 
-- login không đồng nghĩa được tin cậy mãi;
-- healthy device không thay thế business authorization;
-- business role không thay thế device trust;
-- role và trust là hai control độc lập;
-- request mới luôn được reevaluate bằng current state.
+File:
+
+```text
+tests/api_regression.py
+```
+
+Mục tiêu:
+
+- đi qua Access Proxy thật;
+- kiểm tra authentication + policy-input aggregation + OPA decision + enforcement;
+- xác nhận protected request trả đúng `ALLOW` / `DENY`;
+- xác nhận HIGH data không bị fetch khi policy từ chối.
+
+Kết quả tại checkpoint QA backend/policy:
+
+```text
+15 / 15 PASS
+```
+
+### 15.3. Các scenario đã xác nhận thủ công
+
+| Scenario | Kết quả |
+|---|---|
+| Alice + healthy trusted device + HIGH | `200 ALLOW` |
+| Bob + healthy trusted device + HIGH | `DENY · ROLE_DENIED_FOR_HIGH_DATA` |
+| Clean Docker deployment + smoke check | PASS |
+| DENY path không fetch Internal API payload | PASS |
+| Request correlation / Decision Inspector | PASS |
+| Realtime Security Center update | PASS |
+| Light/Dark UI acceptance | PASS |
+
+### 15.4. QA checkpoint và UI freeze
+
+Backend/policy regression checkpoint:
+
+```text
+c7f60e5
+tag: v1.5-final-qa
+```
+
+UI final polish commit:
+
+```text
+f60d0e9
+feat: add light theme and finalize UI polish
+```
+
+Final UI commit chỉ thay đổi frontend/UI scope; backend, OPA policy và database schema không bị sửa trong vòng UI polish.
+
+> Trước khi nộp bài hoặc tạo release cuối, nên chạy lại cả hai regression suite để tạo evidence mới trên đúng commit cuối cùng.
 
 ---
 
-## Benchmark
+## 16. Benchmark
 
 Benchmark artifact:
 
@@ -481,8 +635,8 @@ zt_benchmark_v14_summary.json
 Phương pháp:
 
 - local Docker Compose;
-- 10 warm-up calls mỗi scenario;
-- 100 measured requests mỗi scenario;
+- 10 warm-up call mỗi scenario;
+- 100 measured request mỗi scenario;
 - single client;
 - rotating scenario order.
 
@@ -501,27 +655,42 @@ Relative increase         : 2417.84%
 Absolute P95 overhead     : 94.787 ms
 ```
 
-Các số trên là **end-to-end prototype latency**, không phải riêng OPA latency. Baseline chỉ khoảng `2.9 ms`, vì vậy tỷ lệ phần trăm nhìn rất lớn. Benchmark này cũng **không phải load/scalability test**.
+Các con số trên là **end-to-end prototype latency**, không phải riêng OPA latency.
+
+Full Zero Trust path còn gồm:
+
+- Access Proxy processing;
+- PostgreSQL state lookup;
+- policy-input aggregation;
+- OPA HTTP request;
+- audit persistence;
+- realtime-event persistence;
+- Internal API call trên ALLOW path;
+- serialization/network overhead trong local Docker environment.
+
+Baseline khoảng `2.9 ms`, vì vậy tỷ lệ phần trăm tăng nhìn rất lớn. Benchmark này không phải load test hay scalability test.
 
 ---
 
-## Security hardening
+## 17. Security hardening đã thực hiện
 
-Các hardening đã thực hiện:
+Các hardening chính:
 
-- `JWT_SECRET` externalized sang `.env`.
-- Internal API shared secret externalized sang `.env`.
-- Backend / Compose fail-closed khi secret bắt buộc bị thiếu.
-- `.env` nằm trong `.gitignore`.
-- Internal API yêu cầu internal shared secret.
-- Admin/monitoring endpoint yêu cầu `security-admin`.
-- Business-role workflow không thể cấp `security-admin`.
-- Sensitive payload chỉ fetch sau `ALLOW`.
-- `request_id` được propagate và verify trên ALLOW path.
+- `JWT_SECRET` externalized sang `.env`;
+- Internal API shared secret externalized sang `.env`;
+- backend / Compose fail-closed khi secret bắt buộc bị thiếu;
+- `.env` nằm trong `.gitignore`;
+- Internal API yêu cầu internal shared secret;
+- admin/monitoring endpoint yêu cầu `security-admin`;
+- business-role workflow không thể cấp `security-admin`;
+- sensitive payload chỉ fetch sau `ALLOW`;
+- `request_id` được propagate và verify trên ALLOW path;
+- control-plane role được tách khỏi business role;
+- posture evidence và access decision được persist phục vụ audit.
 
 ---
 
-## Project structure
+## 18. Project structure
 
 ```text
 zero-trust-access-proxy/
@@ -547,10 +716,16 @@ zero-trust-access-proxy/
 │       └── main.py
 │
 ├── migrations/
+│
 ├── nginx/
 │   └── nginx.conf
+│
 ├── opa/
 │   └── policy.rego
+│
+├── tests/
+│   ├── policy_regression.py
+│   └── api_regression.py
 │
 ├── docs/
 │   └── screenshots/
@@ -558,6 +733,7 @@ zero-trust-access-proxy/
 ├── benchmark.py
 ├── docker-compose.yml
 ├── README.md
+├── RUN_DEMO.md
 ├── .env.example
 ├── .gitignore
 ├── zt_benchmark_v14.csv
@@ -566,43 +742,74 @@ zero-trust-access-proxy/
 
 ---
 
-## Giới hạn của prototype
+## 19. Hướng dẫn chạy và demo
+
+Để README tập trung vào kiến trúc, thiết kế và kết quả kỹ thuật, toàn bộ hướng dẫn thao tác được tách sang:
+
+> **[RUN_DEMO.md](RUN_DEMO.md)**
+
+File này bao gồm:
+
+- chuẩn bị môi trường;
+- tạo local secret;
+- build Docker stack;
+- chạy Device Agent;
+- tài khoản demo;
+- kịch bản Zero Trust end-to-end;
+- negative posture scenario;
+- regression test;
+- troubleshooting;
+- lưu ý tránh xóa nhầm Docker volume.
+
+---
+
+## 20. Giới hạn của prototype
 
 Đây là **academic/local-lab prototype**, không phải production deployment.
 
 Các giới hạn chủ động chấp nhận:
 
-1. HTTP localhost, chưa triển khai TLS/mTLS.
-2. Native `EventSource` không gửi custom `Authorization` header, nên lab SSE có caveat về cách truyền token.
+1. Local HTTP, chưa triển khai TLS/mTLS.
+2. Native `EventSource` có giới hạn với custom `Authorization` header; lab SSE có caveat riêng về token transport.
 3. `DEMO_ADMIN_KEY` là demo-only control token, không phải production privileged credential.
 4. Device Agent chưa có hardware-backed attestation hoặc device certificate.
 5. Identity lifecycle chưa tích hợp enterprise IdP / SSO / SCIM.
-6. `security-admin` được bootstrap ngoài business-role workflow; project không triển khai PAM đầy đủ.
-7. Firewall / Patch / Heartbeat demo controls là simulation.
+6. `security-admin` được bootstrap ngoài business-role workflow; project chưa triển khai PAM đầy đủ.
+7. Firewall / Patch / Heartbeat controls là simulation phục vụ demo.
 8. Benchmark là local single-client benchmark, không đại diện production capacity.
-9. Project không triển khai Kubernetes, SIEM/ELK, message broker hoặc distributed tracing platform vì nằm ngoài scope môn học.
+9. Project chưa triển khai Kubernetes, SIEM/ELK, message broker hoặc distributed tracing platform.
+10. Managed device identity trong lab được đơn giản hóa thành `device_id`; production cần tích hợp MDM/EDR/asset inventory và strong device identity.
+11. Prototype tập trung vào minh họa Zero Trust access control, không phải một IAM/MDM platform hoàn chỉnh.
 
 ---
 
-## Góc nhìn kỹ thuật
+## 21. Giá trị kỹ thuật của project
 
 Đây chủ yếu là một **Security / Backend Systems project** cho môn **Bảo mật dữ liệu**.
 
-Project cũng có một số yếu tố hữu ích về data/system engineering như:
+Project thể hiện các chủ đề:
 
-- persistent audit/event data trong PostgreSQL;
-- posture-history ingestion;
-- durable realtime events;
+- Zero Trust architecture;
+- Policy Enforcement Point / Policy Decision Point;
+- ABAC/resource-aware authorization;
+- identity governance;
+- continuous endpoint posture;
+- policy-as-code;
+- PostgreSQL-backed audit evidence;
+- durable realtime event;
+- SSE + REST reconciliation;
 - request correlation;
-- schema migrations;
-- benchmark artifact;
-- multi-service containerized data flow.
+- secret hardening;
+- schema migration;
+- regression testing;
+- benchmark và performance interpretation;
+- multi-service Docker architecture.
 
-Tuy nhiên project **không được trình bày như một Data Engineering pipeline thuần túy**; trọng tâm vẫn là **Zero Trust access control và security evidence**.
+Project cũng có yếu tố data/system engineering thông qua posture-history ingestion, persistent audit/event data và correlation, nhưng trọng tâm vẫn là **Zero Trust access control và security evidence**.
 
 ---
 
-## Trạng thái
+## 22. Trạng thái feature
 
 ```text
 V1.3  Persistent Security Events                 ✅
@@ -620,21 +827,46 @@ V1.5  Viewer ↔ Analyst Role Assignment           ✅
 V1.5  Protected security-admin role              ✅
 V1.5  Realtime Security Center sync              ✅
 V1.5  Identity UI final polish                   ✅
+V2.3  Light/Dark UI final acceptance             ✅
 ```
-
-## V1.5 FINAL — Feature Freeze 🔒
-
-Từ checkpoint này, project chỉ nên nhận:
-
-- bug fix;
-- tài liệu;
-- demo rehearsal;
-- packaging/submission cleanup.
 
 ---
 
-## Ghi chú
+## 23. Feature freeze
 
-Project được xây dựng cho mục đích học tập và trình diễn các nguyên tắc Zero Trust trong môn **Bảo mật dữ liệu**.
+Tại checkpoint hiện tại, project nên ưu tiên:
+
+- bug fix;
+- regression verification;
+- tài liệu;
+- demo rehearsal;
+- screenshot;
+- packaging/submission cleanup.
+
+Không nên mở rộng thêm major feature nếu không thực sự cần thiết cho scope môn học.
+
+---
+
+## 24. Kết luận
+
+Project minh họa một điểm cốt lõi của Zero Trust:
+
+> **Quyền truy cập không được quyết định một lần tại thời điểm login. Nó phải được đánh giá lại cho từng protected request dựa trên current identity, current device state, request context và độ nhạy của tài nguyên.**
+
+Hệ thống kết hợp PEP, OPA/Rego, device posture, role governance, PostgreSQL audit evidence và realtime monitoring để biến quyết định `ALLOW` / `DENY` thành một luồng có thể quan sát và giải thích.
+
+Đây không phải production Zero Trust platform, nhưng là một prototype đủ đầy để minh họa:
+
+```text
+verify identity
++ verify device
++ verify posture
++ verify role
++ verify context
++ verify resource sensitivity
+→ evaluate policy
+→ enforce decision
+→ persist evidence
+```
 
 > **Never trust implicitly. Verify every protected request using current identity, device state, context and resource sensitivity — then persist evidence explaining why access was allowed or denied.**
