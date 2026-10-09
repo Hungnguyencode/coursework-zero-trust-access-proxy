@@ -2497,6 +2497,20 @@ body.role-modal-open{overflow:hidden}
       .soc-login-theme{top:20px;right:18px}
       .soc-login-panel{padding:22px}
     }
+    /* Light theme — stronger danger state for session status */
+    html[data-theme="light"] .system-pill.bad{
+      color:#b92d46;
+      background: linear-gradient(180deg,#fff6f7,#ffecef);
+      border-color:#e98b9c;
+      box-shadow:
+        0 8px 20px rgba(210,47,77,.13),
+        inset 0 0 0 1px rgba(255,255,255,.55);
+      font-weight:650;
+    }
+
+    html[data-theme="light"] .system-pill.bad .pulse.bad{
+      background:#d22f4d;
+    }
 
 </style>
 </head>
