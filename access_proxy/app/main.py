@@ -1530,6 +1530,153 @@ def update_business_role(
 # ============================================================
 # 11. DEVICE ENDPOINTS
 # ============================================================
+def _device_payload(
+    db: Session,
+    device: Device,
+) -> dict:
+    """Return one authoritative device view for UI consumers."""
+    owner = db.scalar(
+        select(User).where(
+            User.id == device.user_id
+        )
+    )
+    latest_posture = get_latest_posture(
+        db,
+        device,
+    )
+    (
+        heartbeat_fresh,
+        heartbeat_age_seconds,
+    ) = get_heartbeat_status(
+        latest_posture
+    )
+    return {
+        "device_id": device.device_id,
+        "device_name": device.device_name,
+        "owner_username": (
+            owner.username
+            if owner
+            else None
+        ),
+        "owner_role": (
+            owner.role
+            if owner
+            else None
+        ),
+        "registered": device.registered,
+        "trust_status": device.trust_status,
+        "firewall_enabled": (
+            latest_posture.firewall_enabled
+            if latest_posture
+            else device.firewall_enabled
+        ),
+        "patch_status": (
+            latest_posture.patch_status
+            if latest_posture
+            else device.patch_status
+        ),
+        "hostname": (
+            latest_posture.hostname
+            if latest_posture
+            else None
+        ),
+        "os_name": (
+            latest_posture.os_name
+            if latest_posture
+            else None
+        ),
+        "os_release": (
+            latest_posture.os_release
+            if latest_posture
+            else None
+        ),
+        "os_version": (
+            latest_posture.os_version
+            if latest_posture
+            else None
+        ),
+        "agent_version": (
+            latest_posture.agent_version
+            if latest_posture
+            else None
+        ),
+        "latest_hotfix_id": (
+            latest_posture.latest_hotfix_id
+            if latest_posture
+            else None
+        ),
+        "latest_hotfix_installed_on": (
+            latest_posture.latest_hotfix_installed_on
+            if latest_posture
+            else None
+        ),
+        "patch_age_days": (
+            latest_posture.patch_age_days
+            if latest_posture
+            else None
+        ),
+        "pending_reboot": (
+            latest_posture.pending_reboot
+            if latest_posture
+            else None
+        ),
+        "patch_reason": (
+            latest_posture.patch_reason
+            if latest_posture
+            else None
+        ),
+        "heartbeat_fresh": heartbeat_fresh,
+        "heartbeat_age_seconds": heartbeat_age_seconds,
+        "last_seen": (
+            latest_posture.reported_at
+            if latest_posture
+            else device.last_seen
+        ),
+    }
+
+
+@app.get("/session")
+def current_session_context(
+    authorization: str | None = Header(
+        default=None
+    ),
+    db: Session = Depends(get_db),
+):
+    """Return the identity and console/device bound to the current JWT.
+
+    This endpoint deliberately differs from /devices for security-admin.
+    /devices is a managed-endpoint fleet view, while /session always returns
+    the device that authenticated the current session (for example SOC-001).
+    """
+    claims, user = get_authenticated_user(
+        authorization,
+        db,
+    )
+    token_device_id = claims.get("device_id")
+    device = db.scalar(
+        select(Device).where(
+            Device.device_id == token_device_id,
+            Device.user_id == user.id,
+        )
+    )
+    if not device or not device.registered:
+        raise HTTPException(
+            status_code=403,
+            detail="Session device is not registered to this user",
+        )
+    return {
+        "user": {
+            "username": user.username,
+            "role": user.role,
+            "active": user.active,
+        },
+        "device": _device_payload(
+            db,
+            device,
+        ),
+    }
+
+
 @app.get("/devices")
 def list_devices(
     authorization: str | None = Header(
@@ -1562,109 +1709,10 @@ def list_devices(
             )
         ).all()
 
-    result = []
-    for device in devices:
-        owner = db.scalar(
-            select(User).where(
-                User.id == device.user_id
-            )
-        )
-        latest_posture = get_latest_posture(
-            db,
-            device,
-        )
-        (
-            heartbeat_fresh,
-            heartbeat_age_seconds,
-        ) = get_heartbeat_status(
-            latest_posture
-        )
-        result.append(
-            {
-                "device_id": device.device_id,
-                "device_name": device.device_name,
-                "owner_username": (
-                    owner.username
-                    if owner
-                    else None
-                ),
-                "owner_role": (
-                    owner.role
-                    if owner
-                    else None
-                ),
-                "registered": device.registered,
-                "trust_status": device.trust_status,
-                "firewall_enabled": (
-                    latest_posture.firewall_enabled
-                    if latest_posture
-                    else device.firewall_enabled
-                ),
-                "patch_status": (
-                    latest_posture.patch_status
-                    if latest_posture
-                    else device.patch_status
-                ),
-                "hostname": (
-                    latest_posture.hostname
-                    if latest_posture
-                    else None
-                ),
-                "os_name": (
-                    latest_posture.os_name
-                    if latest_posture
-                    else None
-                ),
-                "os_release": (
-                    latest_posture.os_release
-                    if latest_posture
-                    else None
-                ),
-                "os_version": (
-                    latest_posture.os_version
-                    if latest_posture
-                    else None
-                ),
-                "agent_version": (
-                    latest_posture.agent_version
-                    if latest_posture
-                    else None
-                ),
-                "latest_hotfix_id": (
-                    latest_posture.latest_hotfix_id
-                    if latest_posture
-                    else None
-                ),
-                "latest_hotfix_installed_on": (
-                    latest_posture.latest_hotfix_installed_on
-                    if latest_posture
-                    else None
-                ),
-                "patch_age_days": (
-                    latest_posture.patch_age_days
-                    if latest_posture
-                    else None
-                ),
-                "pending_reboot": (
-                    latest_posture.pending_reboot
-                    if latest_posture
-                    else None
-                ),
-                "patch_reason": (
-                    latest_posture.patch_reason
-                    if latest_posture
-                    else None
-                ),
-                "heartbeat_fresh": heartbeat_fresh,
-                "heartbeat_age_seconds": heartbeat_age_seconds,
-                "last_seen": (
-                    latest_posture.reported_at
-                    if latest_posture
-                    else device.last_seen
-                ),
-            }
-        )
-    return result
+    return [
+        _device_payload(db, device)
+        for device in devices
+    ]
 
 
 @app.get(

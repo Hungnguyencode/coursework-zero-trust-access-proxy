@@ -42,7 +42,7 @@
         linear-gradient(180deg,#07101f 0%,#080f1d 100%);
       color:var(--text);
     }
-    button,input{font:inherit}
+    button,input,select{font:inherit}
     .app{
       max-width:1480px;
       margin:0 auto;
@@ -580,7 +580,7 @@
       transform:translateY(12px);
       pointer-events:none;
       transition:.2s;
-      z-index:20;
+      z-index:3200;
     }
     .toast.show{
       opacity:1;
@@ -1978,6 +1978,16 @@ body.role-modal-open{overflow:hidden}
       background:#f2f8ff;
       border-color:#9ebee0;
     }
+    html[data-theme="light"] .role-confirm-head{
+      background:rgba(249,252,255,.98);
+      border-color:#b7cfe8;
+    }
+    html[data-theme="light"] .role-confirm-head h3{color:#173250}
+    html[data-theme="light"] .role-confirm-message{color:#4d6f92}
+    html[data-theme="light"] .role-state strong,
+    html[data-theme="light"] .role-context-item strong{color:#173250}
+    html[data-theme="light"] .role-state span,
+    html[data-theme="light"] .role-context-item span{color:#6683a4}
     html[data-theme="light"] .identity-overview-card,
     html[data-theme="light"] .identity-user,
     html[data-theme="light"] .role-state,
@@ -2279,10 +2289,264 @@ body.role-modal-open{overflow:hidden}
        inspector/backdrop/trace rules. This preserves the original animated
        active link and dashed enforced/blocked semantics. */
 
+
+
+    /* ==========================================================
+       SOC LOGIN GATE — protected control-plane entry
+       Uses the existing Security Center palette in both themes.
+       ========================================================== */
+    [hidden]{display:none !important}
+    .soc-login-shell{
+      min-height:100vh;
+      max-width:1180px;
+      margin:0 auto;
+      padding:56px 36px;
+      display:grid;
+      grid-template-columns:minmax(0,1.08fr) minmax(360px,.72fr);
+      gap:68px;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .soc-login-theme{
+      position:absolute;
+      top:30px;
+      right:36px;
+      z-index:3;
+    }
+    .soc-login-copy{position:relative;z-index:1}
+    .soc-login-copy .brand-mark{margin-bottom:26px}
+    .soc-login-copy h1{
+      margin:18px 0 20px;
+      max-width:720px;
+      font-size:clamp(48px,6.4vw,78px);
+      line-height:.98;
+      letter-spacing:-.055em;
+    }
+    .soc-login-copy h1 span{
+      background:linear-gradient(90deg,var(--cyan),#9a8cff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .soc-login-copy>p{
+      max-width:650px;
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.72;
+    }
+    .soc-login-flow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:28px 0 20px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:760;
+    }
+    .soc-login-flow strong{color:var(--green)}
+    .soc-login-flow .flow-arrow{color:#5f7698}
+    .soc-login-note{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      max-width:610px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .soc-login-note .note-dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:var(--green);
+      box-shadow:0 0 16px rgba(77,227,155,.5);
+      margin-top:5px;
+      flex:0 0 auto;
+    }
+    .soc-login-panel{
+      padding:30px;
+      border-radius:26px;
+      position:relative;
+      z-index:1;
+    }
+    .soc-login-panel .section-title{margin-bottom:22px}
+    .soc-login-panel .section-title h2{font-size:23px;letter-spacing:-.02em}
+    .soc-login-kicker{
+      color:var(--muted);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      margin-bottom:14px;
+    }
+    .soc-login-form{display:grid;gap:15px}
+    .soc-login-form .field label{font-weight:650}
+    .soc-login-error{
+      display:none;
+      align-items:flex-start;
+      gap:9px;
+      padding:11px 12px;
+      border-radius:12px;
+      color:#ffbdc7;
+      background:rgba(255,107,126,.08);
+      border:1px solid rgba(255,107,126,.22);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .soc-login-error.show{display:flex}
+    .soc-login-error.good{
+      color:#adf9d0;
+      background:rgba(77,227,155,.07);
+      border-color:rgba(77,227,155,.22);
+    }
+    .soc-login-actions{display:grid;gap:10px;margin-top:2px}
+    .soc-login-actions .btn{min-height:46px}
+    .soc-login-hint{
+      margin-top:17px;
+      padding-top:16px;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .session-identity{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:16px;
+      padding:13px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(8,17,32,.46);
+    }
+    .session-identity-icon{
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      color:var(--green);
+      border:1px solid rgba(77,227,155,.24);
+      background:rgba(77,227,155,.06);
+      font-weight:900;
+    }
+    .session-identity span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+    .session-identity strong{display:block;margin-top:3px;font-size:15px}
+    select{
+      width:100%;
+      border:1px solid var(--border-strong);
+      border-radius:11px;
+      padding:11px 38px 11px 12px;
+      background:#091426;
+      color:var(--text);
+      outline:none;
+      transition:.2s ease;
+      cursor:pointer;
+    }
+    select:focus{
+      border-color:var(--cyan);
+      box-shadow:0 0 0 3px rgba(66,213,255,.09);
+    }
+    select:disabled{opacity:.58;cursor:not-allowed}
+    .monitor-help{margin-top:7px;color:var(--muted);font-size:11px;line-height:1.45}
+    .signout-shortcut{cursor:pointer;font:inherit}
+
+    html[data-theme="light"] .soc-login-panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(247,251,255,.97));
+      border-color:#a9c8ec;
+    }
+    html[data-theme="light"] .soc-login-copy h1 span{
+      background:linear-gradient(90deg,#13b9e8,#6b78ff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    html[data-theme="light"] .soc-login-note{color:#405f7d}
+    html[data-theme="light"] .soc-login-error{
+      color:#b72945;
+      background:#fff0f3;
+      border-color:#ef9caf;
+    }
+    html[data-theme="light"] .soc-login-error.good{
+      color:#08784f;
+      background:#e8fbf2;
+      border-color:#8ad4b3;
+    }
+    html[data-theme="light"] .session-identity{
+      background:#f1f7ff;
+      border-color:#9fc2e8;
+    }
+    html[data-theme="light"] select{
+      color:#092441;
+      background:#f1f7ff;
+      border-color:#75a8dc;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(43,92,157,.04);
+      font-weight:650;
+    }
+    html[data-theme="light"] select:focus{
+      border-color:#438ee8;
+      box-shadow:0 0 0 3px rgba(47,120,255,.10);
+    }
+    @media(max-width:900px){
+      .soc-login-shell{grid-template-columns:1fr;max-width:720px;gap:34px;padding-top:92px}
+      .soc-login-copy h1{font-size:clamp(44px,11vw,68px)}
+    }
+    @media(max-width:560px){
+      .soc-login-shell{padding:86px 18px 28px}
+      .soc-login-theme{top:20px;right:18px}
+      .soc-login-panel{padding:22px}
+    }
+
 </style>
 </head>
 <body>
-<main class="app">
+<section id="socLoginGate" class="soc-login-shell">
+  <div class="soc-login-theme theme-segment" role="group" aria-label="Appearance theme">
+    <button id="gateThemeLight" class="theme-choice" type="button" onclick="setTheme('light')" title="Use light appearance"><span aria-hidden="true">☀</span><span>Light</span></button>
+    <button id="gateThemeDark" class="theme-choice" type="button" onclick="setTheme('dark')" title="Use dark appearance"><span aria-hidden="true">☾</span><span>Dark</span></button>
+  </div>
+  <div class="soc-login-copy">
+    <div class="brand-mark" aria-hidden="true">🛡️</div>
+    <div class="eyebrow">PROTECTED CONTROL PLANE</div>
+    <h1>Zero Trust<br><span>Security Center</span></h1>
+    <p>Administrative visibility is separated from business-data access. Authenticate a registered SOC console before the control plane is rendered.</p>
+    <div class="soc-login-flow" aria-label="Security Center authorization path">
+      <span>Identity</span><span class="flow-arrow">›</span><span>Console device</span><span class="flow-arrow">›</span><span>Role check</span><span class="flow-arrow">›</span><strong>Security Center</strong>
+    </div>
+    <div class="soc-login-note"><span class="note-dot"></span><span>VIEWER and ANALYST identities may authenticate to the platform, but they cannot enter this security-admin control plane.</span></div>
+  </div>
+  <article class="soc-login-panel panel">
+    <div class="section-title">
+      <div>
+        <div class="eyebrow">SOC OPERATOR SESSION</div>
+        <h2>Sign in to Security Center</h2>
+      </div>
+      <span class="badge neutral">security-admin</span>
+    </div>
+    <div class="soc-login-kicker">Protected role · registered admin console required</div>
+    <form class="soc-login-form" onsubmit="event.preventDefault(); login();">
+      <div class="field">
+        <label for="username">Admin username</label>
+        <input id="username" value="socadmin" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="password">Admin password</label>
+        <input id="password" type="password" value="socadmin123" autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label for="authDeviceId">Admin console device</label>
+        <input id="authDeviceId" value="SOC-001" autocomplete="off">
+      </div>
+      <div id="socLoginError" class="soc-login-error" role="alert"></div>
+      <div class="soc-login-actions">
+        <button id="socLoginButton" class="btn primary" type="submit">Authenticate SOC Operator</button>
+      </div>
+    </form>
+    <div class="soc-login-hint">The monitored business device is selected only after authentication. The SOC console device and the monitored endpoint are intentionally separate identities.</div>
+  </article>
+</section>
+<main id="securityCenterApp" class="app" hidden>
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true">🛡️</div>
@@ -2315,8 +2579,19 @@ body.role-modal-open{overflow:hidden}
         title="Convenience link only — users can open Data Vault directly."
       >
         <span>
-          <strong>Open user portal ↗</strong>
-          <small>demo shortcut</small>
+          <strong>Open Data Vault ↗</strong>
+          <small>data plane</small>
+        </span>
+      </button>
+      <button
+        class="portal-shortcut signout-shortcut"
+        type="button"
+        onclick="logoutSoc()"
+        title="End the current Security Center session."
+      >
+        <span>
+          <strong>Sign out</strong>
+          <small>control plane</small>
         </span>
       </button>
       <div id="systemPill" class="system-pill">
@@ -2335,27 +2610,22 @@ body.role-modal-open{overflow:hidden}
           </div>
           <span id="jwtBadge" class="badge neutral">No token</span>
         </div>
-        <div class="login-grid">
-          <div class="field">
-            <label for="username">Admin username</label>
-            <input id="username" value="socadmin" autocomplete="username">
+        <div class="session-identity">
+          <div class="session-identity-icon">SOC</div>
+          <div>
+            <span>Authenticated control-plane operator</span>
+            <strong id="sessionIdentityLabel">Waiting for authentication</strong>
           </div>
-          <div class="field">
-            <label for="password">Admin password</label>
-            <input id="password" type="password" value="socadmin123" autocomplete="current-password">
-          </div>
-          <div class="field">
-            <label for="authDeviceId">Admin console device</label>
-            <input id="authDeviceId" value="SOC-001">
-          </div>
-          <div class="field">
-            <label for="deviceId">Monitored device</label>
-            <input id="deviceId" value="DEV-001">
-          </div>
-          <div class="btn-row">
-            <button class="btn primary" onclick="login()">Authenticate Admin</button>
-            <button class="btn" onclick="refreshAll()">Refresh All</button>
-          </div>
+        </div>
+        <div class="field">
+          <label for="deviceId">Monitored managed endpoint</label>
+          <select id="deviceId" onchange="changeMonitoredDevice()" disabled>
+            <option value="">Authenticate to load managed devices</option>
+          </select>
+          <div class="monitor-help">Select-and-inspect model: one SOC session can observe multiple managed endpoints, while detailed posture and realtime evidence focus on the selected device.</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" onclick="refreshAll()">Refresh All</button>
         </div>
         <div class="session-box">
           <div class="session-line"><span>Operator</span><strong id="sessionUser">—</strong></div>
@@ -3052,10 +3322,14 @@ body.role-modal-open{overflow:hidden}
   }
   function syncThemeSwitch(){
     const light = activeTheme() === 'light';
-    const lightButton = document.getElementById('themeLight');
-    const darkButton = document.getElementById('themeDark');
-    if(lightButton){ lightButton.classList.toggle('active', light); lightButton.setAttribute('aria-pressed', String(light)); }
-    if(darkButton){ darkButton.classList.toggle('active', !light); darkButton.setAttribute('aria-pressed', String(!light)); }
+    for(const id of ['themeLight','gateThemeLight']){
+      const button = document.getElementById(id);
+      if(button){ button.classList.toggle('active', light); button.setAttribute('aria-pressed', String(light)); }
+    }
+    for(const id of ['themeDark','gateThemeDark']){
+      const button = document.getElementById(id);
+      if(button){ button.classList.toggle('active', !light); button.setAttribute('aria-pressed', String(!light)); }
+    }
   }
   function setTheme(theme){
     const next = theme === 'light' ? 'light' : 'dark';
@@ -3079,6 +3353,8 @@ body.role-modal-open{overflow:hidden}
   let tokenExpiresAt = null;
   let currentUser = null;
   let currentDevice = null;
+  let currentAuthDeviceId = null;
+  let managedDevicesCache = [];
   let deviceRefreshTimer = null;
   let secondaryRefreshTimer = null;
   let ttlTimer = null;
@@ -3300,6 +3576,112 @@ body.role-modal-open{overflow:hidden}
   }
 
 
+  function setSocLoginError(message = "", kind = "bad"){
+    const el = qs("socLoginError");
+    if(!el) return;
+    el.textContent = message;
+    el.classList.toggle("show", Boolean(message));
+    el.classList.toggle("good", kind === "good");
+  }
+  function setSecurityCenterAuthenticated(authenticated){
+    const gate = qs("socLoginGate");
+    const app = qs("securityCenterApp");
+    if(gate) gate.hidden = authenticated;
+    if(app) app.hidden = !authenticated;
+  }
+  function resetMonitoredDeviceSelector(){
+    const select = qs("deviceId");
+    if(!select) return;
+    select.innerHTML = '<option value="">Authenticate to load managed devices</option>';
+    select.disabled = true;
+    managedDevicesCache = [];
+  }
+  function syncMonitoredDeviceSelector(devices){
+    const select = qs("deviceId");
+    if(!select) return;
+    const rows = Array.isArray(devices) ? devices : [];
+    const previous = select.value;
+    managedDevicesCache = rows;
+    select.innerHTML = "";
+    if(!rows.length){
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "No managed business devices available";
+      select.appendChild(option);
+      select.disabled = true;
+      return;
+    }
+    for(const device of rows){
+      const option = document.createElement("option");
+      option.value = device.device_id || "";
+      const owner = device.owner_username ? ` · ${device.owner_username}` : "";
+      const name = device.device_name ? ` · ${device.device_name}` : "";
+      option.textContent = `${device.device_id || "Unknown device"}${owner}${name}`;
+      select.appendChild(option);
+    }
+    select.disabled = false;
+    if(rows.some(device => device.device_id === previous)){
+      select.value = previous;
+    }else{
+      select.value = rows[0].device_id || "";
+    }
+  }
+  async function changeMonitoredDevice(){
+    if(!tokenIsValid()) return;
+    stopRealtimeBridge();
+    currentDevice = null;
+    lastDecisionSnapshot = null;
+    decisionIsStale = false;
+    decisionStaleSince = null;
+    latestPostureHistory = [];
+    latestAccessLogs = [];
+    latestSecurityEvents = [];
+    currentDemoControl = null;
+    lastSecurityEventSignature = "";
+    renderedSecurityEventKeys = new Set();
+    renderDevice(null);
+    updateDecisionUI(null, null);
+    renderDemoControl(null);
+    renderSecurityEvents();
+    updateSessionUI();
+    await Promise.all([
+      loadDevices(true),
+      loadPostureHistory(true),
+      loadLogs(true),
+      loadSecurityEvents(true),
+      loadDemoControl(true)
+    ]);
+    updateChecks();
+    updateSystemState();
+    startRealtimeBridge();
+  }
+  function logoutSoc(){
+    clearLiveTimers();
+    token = "";
+    currentUser = null;
+    currentDevice = null;
+    currentAuthDeviceId = null;
+    tokenExpiresAt = null;
+    lastDecisionSnapshot = null;
+    decisionIsStale = false;
+    decisionStaleSince = null;
+    latestPostureHistory = [];
+    latestAccessLogs = [];
+    latestSecurityEvents = [];
+    currentDemoControl = null;
+    resetMonitoredDeviceSelector();
+    renderDemoControl(null);
+    renderSecurityEvents();
+    renderDevice(null);
+    updateDecisionUI(null, null);
+    updateSessionUI();
+    updateChecks();
+    updateSystemState();
+    setSocLoginError("");
+    setSecurityCenterAuthenticated(false);
+    qs("password")?.focus();
+  }
+
   function clearLiveTimers(){
     clearInterval(deviceRefreshTimer);
     clearInterval(secondaryRefreshTimer);
@@ -3339,6 +3721,7 @@ body.role-modal-open{overflow:hidden}
       qs("sessionDevice").textContent = "—";
       qs("sessionTarget").textContent = "—";
       qs("sessionTtl").textContent = "—";
+      if(qs("sessionIdentityLabel")) qs("sessionIdentityLabel").textContent = "Waiting for authentication";
       return;
     }
     const ttlMs = tokenExpiresAt ? tokenExpiresAt - Date.now() : 0;
@@ -3353,8 +3736,11 @@ body.role-modal-open{overflow:hidden}
     }
     qs("sessionUser").textContent = currentUser.username || "—";
     qs("sessionRole").textContent = currentUser.role || "—";
-    qs("sessionDevice").textContent = qs("authDeviceId").value || "—";
+    qs("sessionDevice").textContent = currentAuthDeviceId || "—";
     qs("sessionTarget").textContent = qs("deviceId").value || "—";
+    if(qs("sessionIdentityLabel")){
+      qs("sessionIdentityLabel").textContent = `${currentUser.username || "—"} · ${currentUser.role || "—"}`;
+    }
   }
   function updateSystemState(){
     const pill = qs("systemPill");
@@ -3627,6 +4013,7 @@ body.role-modal-open{overflow:hidden}
     token = "";
     currentUser = null;
     currentDevice = null;
+    currentAuthDeviceId = null;
     tokenExpiresAt = null;
     lastDecisionSnapshot = null;
     decisionIsStale = false;
@@ -3635,44 +4022,58 @@ body.role-modal-open{overflow:hidden}
     latestAccessLogs = [];
     latestSecurityEvents = [];
     currentDemoControl = null;
+    resetMonitoredDeviceSelector();
     renderDemoControl(null);
     lastSecurityEventSignature = "";
     renderedSecurityEventKeys = new Set();
     renderSecurityEvents();
     renderDevice(null);
     updateDecisionUI(null, null);
+    setSocLoginError("");
+    const button = qs("socLoginButton");
+    if(button){
+      button.disabled = true;
+      button.textContent = "Verifying identity…";
+    }
     const body = {
       username: qs("username").value.trim(),
       password: qs("password").value,
       device_id: qs("authDeviceId").value.trim()
     };
-    const { response, data } = await apiJson("/api/auth/login", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify(body)
-    });
-    if(!response.ok){
-      toast(data?.detail || "Login failed");
-      setBadge(qs("jwtBadge"), "Auth failed", "bad");
+    try{
+      const { response, data } = await apiJson("/api/auth/login", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(body)
+      });
+      if(!response.ok){
+        setSocLoginError(data?.detail || "Authentication failed");
+        return;
+      }
+      if(data?.user?.role !== "security-admin"){
+        setSocLoginError(
+          `Access denied: ${data?.user?.role || "this role"} is not authorized for the Security Center control plane.`
+        );
+        return;
+      }
+      token = data.access_token;
+      currentUser = data.user || null;
+      currentAuthDeviceId = data?.device?.device_id || body.device_id;
+      tokenExpiresAt =
+        Date.now() + ((data.expires_in_minutes || 30) * 60 * 1000);
+      setSecurityCenterAuthenticated(true);
+      updateSessionUI();
+      updateChecks();
       updateSystemState();
-      return;
+      toast(`Authenticated as ${currentUser?.username || body.username}`);
+      await refreshAll();
+      startLiveTimers();
+    }finally{
+      if(button){
+        button.disabled = false;
+        button.textContent = "Authenticate SOC Operator";
+      }
     }
-    if(data?.user?.role !== "security-admin"){
-      toast("Security Center requires the security-admin role");
-      setBadge(qs("jwtBadge"), "Admin required", "bad");
-      updateSystemState();
-      return;
-    }
-    token = data.access_token;
-    currentUser = data.user || null;
-    tokenExpiresAt =
-      Date.now() + ((data.expires_in_minutes || 30) * 60 * 1000);
-    updateSessionUI();
-    updateChecks();
-    updateSystemState();
-    toast(`Authenticated as ${currentUser?.username || body.username}`);
-    await refreshAll();
-    startLiveTimers();
   }
   async function setTrust(status){
     const id = qs("deviceId").value.trim();
@@ -4007,20 +4408,26 @@ async function updateDemoControl(
       if(!silent) toast(data?.detail || "Failed to load device");
       return;
     }
+    const rows = Array.isArray(data) ? data : [];
+    syncMonitoredDeviceSelector(rows);
     const id = qs("deviceId").value.trim();
-    const d = Array.isArray(data)
-      ? (data.find(x => x.device_id === id) || data[0] || null)
-      : null;
+    const d = rows.find(x => x.device_id === id) || null;
     renderDevice(d);
+    updateSessionUI();
   }
   async function requestData(){
     if(!token){
       toast("Login first");
       return;
     }
-    const id = qs("deviceId").value.trim();
-    // Load the freshest device view immediately before evaluation.
+    // Load the freshest fleet/device view immediately before evaluation.
+    // Re-read the selected ID afterwards in case the fleet changed.
     await loadDevices(true);
+    const id = qs("deviceId").value.trim();
+    if(!id){
+      toast("Select a managed endpoint first");
+      return;
+    }
     const { response, data } = await apiJson("/api/protected/data", {
       headers:authHeaders({ "X-Device-Id":id })
     });
@@ -4269,6 +4676,12 @@ async function provisionUser(){
 
   if(!body.username || !body.password || !body.device_id){
     toast("Username, password and Device ID are required");
+    return;
+  }
+
+  if(body.password.length < 8){
+    qs("provPassword").focus();
+    toast("Temporary password must contain at least 8 characters");
     return;
   }
 
@@ -4959,6 +5372,13 @@ function hasPersistedEvent(
       return;
     }
     const id = qs("deviceId").value.trim();
+    if(!id){
+      latestPostureHistory = [];
+      qs("rawHistory").textContent = "No managed endpoint selected.";
+      qs("timeline").innerHTML =
+        '<div class="empty">Select a managed endpoint to load posture history.</div>';
+      return;
+    }
     const { response, data } = await apiJson(
       `/api/devices/${encodeURIComponent(id)}/postures?limit=12`,
       { headers:authHeaders() }
@@ -5352,8 +5772,10 @@ function hasPersistedEvent(
       toast("Authenticate first");
       return;
     }
+    // Fleet discovery must finish first because the selected monitored device
+    // is populated from /devices after the SOC session is authenticated.
+    await loadDevices(true);
     await Promise.all([
-        loadDevices(true),
         loadPostureHistory(true),
         loadLogs(true),
         loadSecurityEvents(true),
@@ -5367,6 +5789,8 @@ function hasPersistedEvent(
   // ------------------------------------------------------------
   // Initial render
   // ------------------------------------------------------------
+  resetMonitoredDeviceSelector();
+  setSecurityCenterAuthenticated(false);
   updateSessionUI();
   updateChecks();
   updateSystemState();

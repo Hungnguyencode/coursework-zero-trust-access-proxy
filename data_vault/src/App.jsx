@@ -152,16 +152,13 @@ function Login({ onLogin, theme, onThemeChange }) {
       // This avoids the short skeleton/content flash immediately after login.
       let bootstrap = null;
       try {
-        const [catalog, devices] = await Promise.all([
+        const [catalog, sessionContext] = await Promise.all([
           apiFetch("/protected/resources", {}, nextSession),
-          apiFetch("/devices", {}, nextSession),
+          apiFetch("/session", {}, nextSession),
         ]);
         bootstrap = {
           resources: catalog.resources || [],
-          device:
-            (devices || []).find(
-              (item) => item.device_id === nextSession.deviceId
-            ) || devices?.[0] || null,
+          device: sessionContext?.device || null,
         };
       } catch (bootstrapError) {
         // Authentication already succeeded. If preload fails, enter the
@@ -350,12 +347,12 @@ function Vault({ session, onLogout, initialData = null, theme, onThemeChange }) 
     setLoading(true);
     setMessage("");
     try {
-      const [catalog, devices] = await Promise.all([
+      const [catalog, sessionContext] = await Promise.all([
         apiFetch("/protected/resources", {}, session),
-        apiFetch("/devices", {}, session),
+        apiFetch("/session", {}, session),
       ]);
       setResources(catalog.resources || []);
-      setDevice((devices || []).find((item) => item.device_id === session.deviceId) || devices?.[0] || null);
+      setDevice(sessionContext?.device || null);
     } catch (err) {
       if (err.status === 401) onLogout();
       else setMessage(err.message);
@@ -367,17 +364,12 @@ function Vault({ session, onLogout, initialData = null, theme, onThemeChange }) 
     silent = true
   ) => {
     try {
-      const devices = await apiFetch(
-        "/devices",
+      const sessionContext = await apiFetch(
+        "/session",
         {},
         session
       );
-      const nextDevice = (
-        devices || []
-      ).find(
-        (item) =>
-          item.device_id === session.deviceId
-      ) || devices?.[0] || null;
+      const nextDevice = sessionContext?.device || null;
       setDevice(nextDevice);
       return nextDevice;
     } catch (err) {
@@ -837,7 +829,9 @@ function Vault({ session, onLogout, initialData = null, theme, onThemeChange }) 
             }
           </span>
         </div>
-          <a className="ghost-button" href="http://localhost:8081" target="_blank" rel="noreferrer"><ServerCog size={16} /> Security Center</a>
+          {session.role === "security-admin" && (
+            <a className="ghost-button" href="http://localhost:8081" target="_blank" rel="noreferrer"><ServerCog size={16} /> Security Center</a>
+          )}
           <button className="ghost-button" onClick={onLogout}><LogOut size={16} /> Sign out</button>
         </div>
       </header>
